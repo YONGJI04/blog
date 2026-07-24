@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://YONGJI04.github.io/blog/sitemap.xml
