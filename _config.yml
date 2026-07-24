@@ -2,23 +2,23 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: Paper Notes # the website title (if blank, full name will be used instead)
+title: JIYONG CHOI # the website title (if blank, full name will be used instead)
 first_name: JIYONG
 middle_name:
 last_name: CHOI
 contact_note: >
-  논문 읽고 정리한 내용을 올리는 블로그입니다.
+  논문 정리와 연구 프로젝트를 기록하는 공간입니다.
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  읽은 논문을 정리하는 공간입니다.
+  읽은 논문과 진행한 연구 프로젝트를 정리하는 공간입니다.
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
-keywords: paper notes, research, ai, machine learning # add your own keywords or leave empty
+keywords: research, paper review, ai, machine learning, portfolio # add your own keywords or leave empty
 lang: ko # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: 📄 # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 
 url: https://YONGJI04.github.io # the base hostname & protocol for your site
-baseurl: /paper-notes # the subpath of your site, e.g. /blog/. Leave blank for root
+baseurl: /blog # the subpath of your site, e.g. /blog/. Leave blank for root
 last_updated: false # set to true if you want to display last updated in the footer
 impressum_path: # set to path to include impressum link in the footer, use the same path as permalink in a page, helps to conform with EU GDPR
 back_to_top: true # set to false to disable the back to top button
