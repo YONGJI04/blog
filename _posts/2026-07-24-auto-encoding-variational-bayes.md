@@ -23,31 +23,31 @@ toc:
 데이터 $x$가 관측되지 않은 잠재변수 $z$로부터 생성된다고 가정하는 잠재변수 모델을 생각해보자.
 
 $$
-p_\theta(x) = \int p_\theta(x|z)\, p(z)\, dz
+p_\theta(x) = \int p_\theta(x \vert z)\, p(z)\, dz
 $$
 
-이 모델을 학습하려면 사후분포 $p_\theta(z|x)$가 필요한데, 위 적분이 계산 불가능한 경우가 대부분이라 $p_\theta(z|x)$도 closed-form으로 구할 수 없다. 기존 변분추론(Variational Inference)은 $p_\theta(z|x)$를 다루기 쉬운 분포 $q(z)$로 근사하되, 주로 mean-field 가정과 좌표 상승법(coordinate ascent)으로 데이터 포인트마다 별도로 최적화했다. 이 방식은 대규모 데이터셋이나 복잡한 신경망 기반 근사분포에는 계산 비용이 너무 커서 그대로 쓰기 어려웠다.
+이 모델을 학습하려면 사후분포 $p_\theta(z \vert x)$가 필요한데, 위 적분이 계산 불가능한 경우가 대부분이라 $p_\theta(z \vert x)$도 closed-form으로 구할 수 없다. 기존 변분추론(Variational Inference)은 $p_\theta(z \vert x)$를 다루기 쉬운 분포 $q(z)$로 근사하되, 주로 mean-field 가정과 좌표 상승법(coordinate ascent)으로 데이터 포인트마다 별도로 최적화했다. 이 방식은 대규모 데이터셋이나 복잡한 신경망 기반 근사분포에는 계산 비용이 너무 커서 그대로 쓰기 어려웠다.
 
 ## 제안 방법
 
 ### 인코더-디코더 구조
 
-- **인식 네트워크(encoder)** $q_\phi(z|x)$: 입력 $x$를 받아 잠재분포의 파라미터(평균 $\mu$, 분산 $\sigma^2$)를 출력. 보통 $q_\phi(z|x) = \mathcal{N}(z; \mu_\phi(x), \sigma_\phi^2(x)I)$로 둔다.
-- **생성 네트워크(decoder)** $p_\theta(x|z)$: 잠재변수 $z$를 받아 $x$를 복원.
+- **인식 네트워크(encoder)** $q_\phi(z \vert x)$: 입력 $x$를 받아 잠재분포의 파라미터(평균 $\mu$, 분산 $\sigma^2$)를 출력. 보통 $q_\phi(z \vert x) = \mathcal{N}(z; \mu_\phi(x), \sigma_\phi^2(x)I)$로 둔다.
+- **생성 네트워크(decoder)** $p_\theta(x \vert z)$: 잠재변수 $z$를 받아 $x$를 복원.
 
 ### ELBO (Evidence Lower BOund)
 
 직접 최적화할 수 없는 $\log p_\theta(x)$ 대신, 다음 하한(lower bound)을 최대화한다.
 
 $$
-\log p_\theta(x) \geq \mathbb{E}_{q_\phi(z|x)}\left[\log p_\theta(x|z)\right] - D_{KL}\big(q_\phi(z|x)\,\|\,p(z)\big)
+\log p_\theta(x) \geq \mathbb{E}_{q_\phi(z \vert x)}\left[\log p_\theta(x \vert z)\right] - D_{KL}\big(q_\phi(z \vert x)\,\|\,p(z)\big)
 $$
 
-첫 번째 항은 재구성(reconstruction) 항으로, 인코더가 만든 $z$로부터 $x$를 얼마나 잘 복원하는지를 나타낸다. 두 번째 항은 근사 사후분포 $q_\phi(z|x)$가 사전분포 $p(z)$(보통 표준정규분포)에서 얼마나 벗어나는지에 대한 정규화 역할을 한다. $p(z)$와 $q_\phi(z|x)$를 둘 다 가우시안으로 두면 KL항은 closed-form으로 계산할 수 있다.
+첫 번째 항은 재구성(reconstruction) 항으로, 인코더가 만든 $z$로부터 $x$를 얼마나 잘 복원하는지를 나타낸다. 두 번째 항은 근사 사후분포 $q_\phi(z \vert x)$가 사전분포 $p(z)$(보통 표준정규분포)에서 얼마나 벗어나는지에 대한 정규화 역할을 한다. $p(z)$와 $q_\phi(z \vert x)$를 둘 다 가우시안으로 두면 KL항은 closed-form으로 계산할 수 있다.
 
 ### Reparameterization Trick
 
-문제는 $\mathbb{E}_{q_\phi(z|x)}[\cdot]$ 항을 역전파하려면 샘플링 $z \sim q_\phi(z|x)$ 과정 자체가 미분 가능해야 한다는 점이다. 확률적 샘플링은 그 자체로 미분이 안 되므로, 다음과 같이 노이즈를 분리한다.
+문제는 $\mathbb{E}_{q_\phi(z \vert x)}[\cdot]$ 항을 역전파하려면 샘플링 $z \sim q_\phi(z \vert x)$ 과정 자체가 미분 가능해야 한다는 점이다. 확률적 샘플링은 그 자체로 미분이 안 되므로, 다음과 같이 노이즈를 분리한다.
 
 $$
 z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
