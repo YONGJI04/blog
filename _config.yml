@@ -123,7 +123,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 
 blog_name: # blog_name will be displayed in your blog page
 blog_description: # left blank to hide the header bar on the blog page
-permalink: /blog/:year/:title/
+permalink: /:year/:title/
 lsi: false # produce an index for related posts
 
 # Pagination
