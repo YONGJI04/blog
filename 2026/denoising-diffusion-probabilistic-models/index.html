@@ -1,0 +1,139 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM) | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/denoising-diffusion-probabilistic-models/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/publications/">publications </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/projects/">projects </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)</h1> <p class="post-meta"> Created on August 04, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> diffusion   <i class="fa-solid fa-hashtag fa-sm"></i> ddpm   <i class="fa-solid fa-hashtag fa-sm"></i> generative-model   <i class="fa-solid fa-hashtag fa-sm"></i> score-matching   ·   <i class="fa-solid fa-tag fa-sm"></i> Generative AI </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: Denoising Diffusion Probabilistic Models</li> <li> <strong>저자</strong>: Jonathan Ho, Ajay Jain, Pieter Abbeel (UC Berkeley)</li> <li> <strong>학회</strong>: NeurIPS 2020</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>데이터에 $T$ 스텝에 걸쳐 조금씩 가우시안 노이즈를 섞어 완전한 노이즈로 만드는 <strong>forward process</strong>를 고정해두고, 신경망이 그 반대 방향(노이즈 → 데이터)으로 한 스텝씩 복원하는 <strong>reverse process</strong>를 학습하게 만드는 생성모델. 학습 목적함수가 결국 “각 스텝에 섞인 노이즈를 예측하는” 단순한 회귀 손실로 정리되면서, <a href="/blog/2026/generative-adversarial-networks/">GAN</a>의 불안정한 적대적 학습이나 <a href="/blog/2026/auto-encoding-variational-bayes/">VAE</a>의 흐릿한 샘플 문제 없이 고품질 샘플을 만들어냈고, 이후 Stable Diffusion, DALL-E 2, Imagen 등 현재 이미지 생성모델 대부분의 근간이 되었다.</p> <h2 id="배경">배경</h2> <p>이 논문 이전까지 딥러닝 생성모델은 대체로 두 갈래였다.</p> <ul> <li> <strong>GAN</strong>: 적대적 학습으로 선명한 샘플을 만들지만, 학습이 불안정하고 mode collapse에 취약하며 명시적 우도가 없다.</li> <li> <strong>VAE</strong>: ELBO를 직접 최적화해서 학습은 안정적이지만, 사후분포를 단순한 형태(주로 가우시안)로 근사하다 보니 샘플이 흐릿해지는 경향이 있다.</li> </ul> <p>한편 diffusion 모델 자체는 Sohl-Dickstein et al. (2015)이 비평형 열역학(non-equilibrium thermodynamics)에서 아이디어를 가져와 먼저 제안했지만, 그때는 샘플 품질이 GAN에 크게 못 미쳤다. DDPM은 이 프레임워크를 다시 가져와서, <strong>목적함수를 노이즈 예측이라는 형태로 재정식화</strong>하면 학습이 훨씬 쉬워지고 실제로 GAN급 샘플 품질이 나온다는 걸 보였다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="forward-process-노이즈-주입">Forward Process (노이즈 주입)</h3> <p>데이터 $x_0$에서 시작해서, 정해진 분산 스케줄 $\beta_1, \dots, \beta_T$에 따라 매 스텝 조금씩 가우시안 노이즈를 더한다. 이 과정은 학습 파라미터가 없는 고정된 마르코프 체인이다.</p> \[q(x_t \mid x_{t-1}) = \mathcal{N}\left(x_t; \sqrt{1-\beta_t}\, x_{t-1}, \beta_t I\right)\] <p>중요한 성질은, 이 체인을 여러 스텝 합성해도 여전히 닫힌 형태의 가우시안이라는 것이다. $\alpha_t = 1-\beta_t$, $\bar\alpha_t = \prod_{s=1}^t \alpha_s$라 하면</p> \[q(x_t \mid x_0) = \mathcal{N}\left(x_t; \sqrt{\bar\alpha_t}\, x_0,\ (1-\bar\alpha_t) I\right)\] <p>즉 임의의 스텝 $t$의 노이즈 낀 이미지를 매 스텝 반복하지 않고 <strong>한 번에</strong> 샘플링할 수 있다: $x_t = \sqrt{\bar\alpha_t}\,x_0 + \sqrt{1-\bar\alpha_t}\,\epsilon$, $\epsilon \sim \mathcal{N}(0, I)$. $T$가 충분히 크면 $x_T$는 거의 순수한 표준 가우시안 노이즈가 된다.</p> <h3 id="reverse-process-노이즈-제거-학습-대상">Reverse Process (노이즈 제거, 학습 대상)</h3> <p>생성은 반대 방향이다. 순수 노이즈 $x_T \sim \mathcal{N}(0,I)$에서 시작해서, 신경망 $p_\theta$가 한 스텝씩 노이즈를 걷어내며 $x_0$까지 복원한다.</p> \[p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\left(x_{t-1}; \mu_\theta(x_t, t),\ \Sigma_\theta(x_t, t)\right)\] <p>$q(x_{t-1}\mid x_t, x_0)$ 자체는 $x_0$를 알면 닫힌 형태의 가우시안이라는 사실(베이즈 정리로 유도)을 이용해서 variational lower bound를 전개하면, 각 스텝의 손실이 결국 $q$와 $p_\theta$ 두 가우시안 사이의 KL divergence, 즉 <strong>평균들 간의 거리</strong>로 정리된다.</p> <h3 id="핵심-재정식화-노이즈-예측으로-단순화">핵심 재정식화: 노이즈 예측으로 단순화</h3> <p>논문의 핵심 기여는 여기서다. $\mu_\theta(x_t,t)$를 직접 예측하는 대신, forward process 식 $x_t = \sqrt{\bar\alpha_t}x_0 + \sqrt{1-\bar\alpha_t}\epsilon$을 이용해 $\mu_\theta$를 노이즈 $\epsilon$에 대한 식으로 재매개변수화(reparameterize)하면, 학습 목적함수가 극도로 단순해진다.</p> \[L_{simple}(\theta) = \mathbb{E}_{t,\, x_0,\, \epsilon}\left[\left\| \epsilon - \epsilon_\theta(x_t, t) \right\|^2\right]\] <p>즉 신경망 $\epsilon_\theta$는 <strong>“이 시점 $t$에 이 이미지 $x_t$에 실제로 섞여 있는 노이즈 $\epsilon$이 뭐였는지”만 예측</strong>하도록 MSE로 학습한다. VAE의 ELBO 항이나 GAN의 min-max 게임에 비해 압도적으로 단순한, 이미지 디노이징(denoising) 회귀 문제가 된 것이다.</p> <h3 id="샘플링">샘플링</h3> <p>학습된 $\epsilon_\theta$로 $x_T$에서 $x_0$까지 $T$ 스텝을 거꾸로 반복한다.</p> \[x_{t-1} = \frac{1}{\sqrt{\alpha_t}}\left(x_t - \frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\epsilon_\theta(x_t, t)\right) + \sigma_t z, \quad z \sim \mathcal{N}(0,I)\] <p>매 스텝 신경망을 한 번씩 호출해야 하므로, $T$(논문에서는 1000)만큼 forward pass를 반복해야 샘플 하나가 나온다 — 이게 뒤에서 언급할 가장 큰 실용적 단점이다.</p> <h3 id="아키텍처">아키텍처</h3> <p>$\epsilon_\theta(x_t, t)$는 U-Net 구조를 사용한다. 인코더-디코더 사이에 skip connection이 있어 저수준 디테일을 보존하고, 시간 스텝 $t$는 Transformer의 positional encoding과 같은 방식(sinusoidal embedding)으로 인코딩해서 각 레이어에 주입한다.</p> <h2 id="실험-결과">실험 결과</h2> <ul> <li>CIFAR-10에서 FID(Fréchet Inception Distance) 3.17을 달성해, 당시 대부분의 GAN 기반 모델을 능가.</li> <li>LSUN 데이터셋(교회, 침실 등)에서도 고해상도의 사실적인 이미지 생성.</li> <li>Inception Score 등 정량 지표에서 우도 기반 모델(NLL 최적화) 대비 뚜렷한 샘플 품질 우위를 보임 — 저자들도 지적하듯, DDPM의 손실은 lossless codelength 관점에서는 최적이 아니지만 지각적(perceptual) 품질에서는 오히려 더 낫다.</li> </ul> <h2 id="느낀-점">느낀 점</h2> <ul> <li>GAN 리뷰에서 “판별자를 속인다”는 프레이밍, VAE 리뷰에서 “잠재변수의 사후분포를 근사한다”는 프레이밍을 봤는데, DDPM은 문제를 아예 <strong>“이미지에 낀 노이즈를 맞히는 회귀”</strong>로 바꿔버린 게 제일 인상적이다. 목적함수가 단순해질수록(MSE) 학습이 안정적이라는 걸 세 논문을 나란히 보면서 체감했다.</li> <li>다만 이 안정성의 대가가 명확하다 — 샘플 하나 만드는 데 $T=1000$번의 신경망 forward pass가 필요해서, GAN(1회 forward)이나 VAE(1회 forward)에 비해 추론이 압도적으로 느리다. 이후 DDIM, latent diffusion(Stable Diffusion) 같은 후속 연구들이 정확히 이 “샘플링 스텝 수” 문제를 줄이는 데 집중한 이유가 여기서 바로 이해가 됐다.</li> <li>$L_{simple}$이 사실은 원래의 variational lower bound에서 각 항의 가중치를 다 무시하고 단순 MSE로 근사한 것인데, 이 “이론적으로는 느슨한 근사”가 오히려 실제 샘플 품질을 더 좋게 만든다는 점이 흥미롭다 — 우도 최적화와 지각 품질이 항상 같은 방향이 아니라는 걸 보여주는 사례로 느껴졌다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "nav-publications",
+          title: "publications",
+          description: "내가 낸 논문 목록",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/publications/";
+          },
+        },{id: "nav-projects",
+          title: "projects",
+          description: "진행한 연구/프로젝트 정리",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/projects/";
+          },
+        },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%73%77%68%73%30%35%33@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
