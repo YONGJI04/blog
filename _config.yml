@@ -308,9 +308,9 @@ jekyll-archives:
   posts:
     enabled: [year, tags, categories] # enables year, tag and category archives (remove if you need to disable one of them).
     permalinks:
-      year: "/blog/:year/"
-      tags: "/blog/:type/:name/"
-      categories: "/blog/:type/:name/"
+      year: "/:year/"
+      tags: "/:type/:name/"
+      categories: "/:type/:name/"
 
 display_tags: [] # these tags will be displayed on the front page of your blog
 display_categories: ["Generative AI", "Computer Vision", "Multimodal", "NLP", "LLM"] # these categories will be displayed on the front page of your blog
