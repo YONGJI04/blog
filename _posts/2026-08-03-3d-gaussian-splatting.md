@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering"
-date: 2026-07-31 09:00:00+0900
+date: 2026-08-03 09:00:00+0900
 description: 3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리
 tags: 3dgs gaussian-splatting neural-rendering real-time-rendering
 categories: ["Computer Vision"]
