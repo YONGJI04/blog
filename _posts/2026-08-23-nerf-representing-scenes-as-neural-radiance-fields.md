@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis"
-date: 2026-08-13 09:00:00+0900
+date: 2026-08-23 09:00:00+0900
 description: 3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리
 tags: nerf neural-rendering view-synthesis volume-rendering
 categories: ["Computer Vision"]

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)"
-date: 2026-08-03 09:00:00+0900
+date: 2026-08-13 09:00:00+0900
 description: VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리
 tags: vqgan vq-vae transformer image-generation
 categories: ["Generative AI"]
