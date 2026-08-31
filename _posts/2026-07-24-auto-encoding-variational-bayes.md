@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)"
-date: 2026-07-27 10:00:00+0900
+date: 2026-07-24 10:00:00+0900
 description: 잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리
 tags: vae generative-model variational-inference
 categories: ["Generative AI"]

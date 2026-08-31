@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)"
-date: 2026-08-10 09:00:00+0900
+date: 2026-08-28 09:00:00+0900
 description: 픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리
 tags: stable-diffusion latent-diffusion diffusion text-to-image
 categories: ["Generative AI"]

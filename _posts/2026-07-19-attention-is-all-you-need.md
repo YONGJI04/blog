@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Attention Is All You Need (Transformer)"
-date: 2026-07-24 09:00:00+0900
+date: 2026-07-19 09:00:00+0900
 description: RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리
 tags: transformer attention seq2seq
 categories: NLP
