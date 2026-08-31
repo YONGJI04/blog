@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Generative Adversarial Networks (GAN)"
-date: 2026-08-23 09:00:00+0900
+date: 2026-07-29 09:00:00+0900
 description: 생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리
 tags: gan generative-model adversarial-training
 categories: ["Generative AI"]
