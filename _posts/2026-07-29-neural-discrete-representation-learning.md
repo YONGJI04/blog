@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)"
-date: 2026-08-18 09:00:00+0900
+date: 2026-07-29 09:00:00+0900
 description: 연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리
 tags: vq-vae vae generative-model representation-learning
 categories: ["Generative AI"]
