@@ -1,0 +1,213 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] Segment Anything (SAM) | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/segment-anything/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] Segment Anything (SAM)</h1> <p class="post-meta"> Created on September 09, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> sam   <i class="fa-solid fa-hashtag fa-sm"></i> segmentation   <i class="fa-solid fa-hashtag fa-sm"></i> foundation-model   <i class="fa-solid fa-hashtag fa-sm"></i> zero-shot   <i class="fa-solid fa-hashtag fa-sm"></i> prompt   ·   <i class="fa-solid fa-tag fa-sm"></i> Computer Vision </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: Segment Anything</li> <li> <strong>저자</strong>: Alexander Kirillov, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao, Spencer Whitehead, Alexander C. Berg, Wan-Yen Lo, Piotr Dollár, Ross Girshick (Meta AI Research, FAIR)</li> <li> <strong>학회</strong>: ICCV 2023</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>점·박스·텍스트 같은 <strong>프롬프트를 입력받아 그에 해당하는 분할 마스크를 즉시 반환</strong>하는 태스크를 정의하고, 이를 위한 모델(SAM)과 학습 데이터(11M 이미지, 10억 개 마스크)를 모델-데이터 선순환(data engine)으로 함께 만들어낸 논문. 특정 클래스나 도메인에 국한되지 않고 <strong>임의의 객체·부분을 제로샷으로 분할</strong>할 수 있는, 분할(segmentation) 분야의 파운데이션 모델을 제시했다.</p> <h2 id="배경">배경</h2> <p>기존 분할 모델들은 대부분 특정 데이터셋·클래스 집합에 맞춰 처음부터 학습되는 폐쇄형(closed-set) 방식이었다. NLP에서 GPT류 모델이 “프롬프트 하나로 다양한 태스크를 제로샷으로 푸는” 파운데이션 모델 패러다임을 보여준 것처럼, 분할에서도 비슷한 범용성을 얻을 수 있을지가 이 논문의 출발점이다.</p> <p>문제는 그런 범용 분할 모델을 학습시킬 만큼 크고 다양한 마스크 데이터가 애초에 존재하지 않았다는 점이다. 논문은 모델을 만드는 것과 그 모델을 학습시킬 데이터를 만드는 것을 <strong>동시에, 서로를 이용해서</strong> 진행하는 방식으로 이 문제를 정면 돌파한다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="promptable-segmentation-task">Promptable Segmentation Task</h3> <p>새로운 태스크를 정의한다: 이미지와 함께 분할 대상을 가리키는 <strong>프롬프트</strong>(전경/배경을 나타내는 점, 바운딩 박스, 대략적인 마스크, 나아가 텍스트까지)가 주어지면, 그 프롬프트와 일치하는 <strong>유효한 분할 마스크</strong>를 반환한다. 프롬프트가 모호할 수 있다는 것도 태스크 정의에 포함된다 — 예를 들어 셔츠 위의 점 하나는 “셔츠”를 가리킬 수도, “사람 전체”를 가리킬 수도 있다.</p> <h3 id="모델-구조">모델 구조</h3> <p>세 부분으로 구성된, 실시간 상호작용이 가능하도록 설계된 가벼운 구조다.</p> <ul> <li> <strong>Image Encoder</strong>: MAE로 사전학습된 ViT를 사용해 이미지 하나당 한 번만 무거운 연산을 수행하고, 이미지 임베딩을 얻는다.</li> <li> <strong>Prompt Encoder</strong>: 점·박스는 위치 인코딩으로, 텍스트는 CLIP 텍스트 인코더로, 마스크 프롬프트는 컨볼루션으로 각각 임베딩한다.</li> <li> <strong>Mask Decoder</strong>: 이미지 임베딩과 프롬프트 임베딩을 받아 마스크를 출력하는 가벼운 트랜스포머 디코더. 이미지 인코딩은 미리 계산해두고 프롬프트만 바뀌는 상황(대화형 편집 등)에서는 이 부분만 50ms 이내로 재실행하면 되도록 설계되어 있다.</li> </ul> <p><strong>모호성 처리</strong>: 프롬프트 하나로 여러 스케일의 유효한 마스크(예: 부분·객체·객체 그룹)가 나올 수 있으므로, 디코더는 단일 마스크 대신 <strong>3개의 마스크 후보와 각각의 confidence score</strong>를 동시에 출력한다. 학습 시에는 이 중 ground truth와 가장 잘 맞는 것에만 loss를 역전파해서, 모델이 모호성을 회피하지 않고 명시적으로 다루도록 만든다.</p> <h3 id="data-engine-모델과-데이터의-선순환">Data Engine: 모델과 데이터의 선순환</h3> <p>SA-1B라는 11M 이미지, 10억 개 마스크짜리 데이터셋을 3단계 순환으로 구축한다.</p> <ol> <li> <strong>Assisted-manual</strong>: 사람 라벨러가 SAM이 제안한 마스크를 보며 클릭으로 교정·추가 — 초기 저품질 SAM으로 라벨링 속도를 높임.</li> <li> <strong>Semi-automatic</strong>: SAM이 이미 자신있게 예측하는 객체는 자동으로 남겨두고, 사람은 SAM이 놓친 나머지 객체만 라벨링 — 마스크 다양성을 늘리는 데 집중.</li> <li> <strong>Fully automatic</strong>: 이미지 위에 격자 형태로 점 프롬프트를 촘촘히 뿌려 SAM이 스스로 마스크를 생성하고, IoU 예측값과 안정성(stability)으로 필터링 + NMS로 중복 제거 — 사람 개입 없이 대부분의 최종 데이터를 생성.</li> </ol> <p>모델이 좋아질수록 데이터 생성이 빨라지고, 늘어난 데이터로 모델이 다시 좋아지는 구조 — 데이터셋 규모(10억 마스크)가 기존 분할 데이터셋 대비 수백 배 큰 이유가 이 자동화 단계 덕분이다.</p> <h2 id="실험-결과">실험 결과</h2> <ul> <li>23개의 서로 다른 분할 데이터셋에 대해 파인튜닝 없이 프롬프트(점 1개)만으로 평가했을 때, 대부분의 데이터셋에서 기존의 완전지도 학습 baseline과 비등하거나 더 나은 zero-shot 성능.</li> <li>사람 평가에서도, 모호한 상황에서 SAM이 제시하는 다중 마스크 후보의 품질이 baseline 대비 크게 우수.</li> <li>엣지 검출, 객체 제안(object proposal), 인스턴스 분할, 텍스트-프롬프트 분할 등 학습 때 명시적으로 다루지 않은 다운스트림 태스크에도 zero-shot으로 잘 전이됨을 보임.</li> </ul> <h2 id="느낀-점">느낀 점</h2> <ul> <li>“모델을 학습시킬 데이터가 없다”는 문제를 데이터를 먼저 손으로 다 만들고 나서 모델을 학습하는 순서가 아니라, <strong>불완전한 모델이라도 일단 배포해서 데이터 생성을 거들게 하고 그 데이터로 모델을 다시 개선하는 순환</strong>으로 푼 방식이 인상 깊었다. 데이터와 모델을 별개의 단계로 보지 않는 이 접근이, 이후 다른 파운데이션 모델 데이터셋 구축에도 참고가 될 만한 템플릿처럼 느껴진다.</li> <li>진행 중인 Scan-to-CAD 파이프라인(S²-2DGS)에서 SAM 마스크를 배경 제거용 전처리로만 쓰다가, 이 논문을 읽고 나서 “SAM이 애초에 모호성을 명시적으로 다루도록 설계됐다”는 걸 알게 됐다. 우리 파이프라인에서 마스크를 입력 단계 전처리에 그치지 않고 <a href="/blog/2026/2d-gaussian-splatting/">2D Gaussian Splatting</a> 학습 단계의 supervision 신호(silhouette loss)로도 쓰기로 한 선택이, SAM이 원래 제공하는 정보(마스크 confidence, 다중 후보)를 더 적극적으로 활용하는 방향과 맞닿아 있다는 생각이 들었다.</li> <li>프롬프트 인코더가 점·박스·텍스트를 전부 같은 임베딩 공간으로 통합해서 받는 구조가, 이후 Grounding DINO나 여러 open-vocabulary detection/segmentation 모델들의 표준적인 설계로 자리잡은 걸 보면, 이 논문이 단순히 “큰 데이터셋 하나”가 아니라 이후 몇 년간의 분할 연구 방향 자체를 정한 논문이라는 게 실감났다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "post-논문-리뷰-segment-anything-sam",
+        
+          title: "[논문 리뷰] Segment Anything (SAM)",
+        
+        description: "프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/segment-anything/";
+          
+        },
+      },{id: "post-논문-리뷰-2d-gaussian-splatting-for-geometrically-accurate-radiance-fields",
+        
+          title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+        
+        description: "3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-matching-for-generative-modeling",
+        
+          title: "[논문 리뷰] Flow Matching for Generative Modeling",
+        
+        description: "시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-matching-for-generative-modeling/";
+          
+        },
+      },{id: "post-논문-리뷰-3d-gaussian-splatting-for-real-time-radiance-field-rendering",
+        
+          title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+        
+        description: "3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/3d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-nerf-representing-scenes-as-neural-radiance-fields-for-view-synthesis",
+        
+          title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+        
+        description: "3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/";
+          
+        },
+      },{id: "post-논문-리뷰-high-resolution-image-synthesis-with-latent-diffusion-models-stable-diffusion",
+        
+          title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)",
+        
+        description: "픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/high-resolution-image-synthesis-with-latent-diffusion-models/";
+          
+        },
+      },{id: "post-논문-리뷰-taming-transformers-for-high-resolution-image-synthesis-vq-gan",
+        
+          title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)",
+        
+        description: "VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/taming-transformers-for-high-resolution-image-synthesis/";
+          
+        },
+      },{id: "post-논문-리뷰-neural-discrete-representation-learning-vq-vae",
+        
+          title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)",
+        
+        description: "연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/neural-discrete-representation-learning/";
+          
+        },
+      },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%6E%67%79%6F%6E%67@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
