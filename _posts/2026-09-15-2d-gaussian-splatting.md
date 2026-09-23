@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields"
-date: 2026-09-05 09:00:00+0900
+date: 2026-09-15 09:00:00+0900
 description: 3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리
 tags: 2dgs gaussian-splatting surface-reconstruction neural-rendering
 categories: ["Computer Vision"]

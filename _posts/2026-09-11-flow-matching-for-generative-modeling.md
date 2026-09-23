@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Flow Matching for Generative Modeling"
-date: 2026-09-01 09:00:00+0900
+date: 2026-09-11 09:00:00+0900
 description: 시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리
 tags: flow-matching normalizing-flow ode generative-model diffusion
 categories: ["Generative AI"]
