@@ -1,0 +1,235 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/dinov2-learning-robust-visual-features-without-supervision/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision</h1> <p class="post-meta"> Created on July 22, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> dinov2   <i class="fa-solid fa-hashtag fa-sm"></i> self-supervised-learning   <i class="fa-solid fa-hashtag fa-sm"></i> vit   <i class="fa-solid fa-hashtag fa-sm"></i> foundation-model   <i class="fa-solid fa-hashtag fa-sm"></i> representation-learning   ·   <i class="fa-solid fa-tag fa-sm"></i> Computer Vision </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: DINOv2: Learning Robust Visual Features without Supervision</li> <li> <strong>저자</strong>: Maxime Oquab, Timothée Darcet, Théo Moutakanni, Huy Vo, Marc Szafraniec, Vasil Khalidov, Pierre Fernandez, Daniel Haziza, Francisco Massa, Alaaeldin El-Nouby, Mahmoud Assran, Nicolas Ballas, Wojciech Galuba, Russell Howes, Po-Yao Huang, Shang-Wen Li, Ishan Misra, Michael Rabbat, Vasu Sharma, Gabriel Synnaeve, Hu Xu, Hervé Jégou, Julien Mairal, Patrick Labatut, Armand Joulin, Piotr Bojanowski (Meta AI Research)</li> <li> <strong>게재</strong>: TMLR 2024</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>라벨이나 텍스트 없이 이미지만으로 학습한 <a href="/blog/2026/an-image-is-worth-16x16-words/">ViT</a>가, <strong>파인튜닝 없이 고정(frozen)한 채로 분류·분할·깊이 추정·검색 등 다양한 태스크에 바로 쓸 수 있는</strong> 범용 특징을 내놓도록 만든 논문이다. 새로운 학습 기법을 하나 제안하기보다, 기존 자기지도 기법들을 결합하고 <strong>데이터 큐레이션과 대규모 학습 안정화</strong>를 정교하게 다듬어 자기지도 학습이 CLIP류의 약한 지도(weakly-supervised) 특징에 필적할 수 있음을 보였다.</p> <h2 id="배경">배경</h2> <p>NLP에서는 대규모 텍스트로 사전학습한 모델을 파인튜닝 없이 여러 태스크에 쓰는 파운데이션 모델이 일반화되었다. 비전에서는 이미지-텍스트 쌍으로 학습한 CLIP 계열이 그 역할을 했지만, 텍스트 캡션은 이미지의 세부 정보(위치, 깊이, 국소 구조)를 충분히 담지 못한다는 한계가 있다.</p> <p>자기지도 학습은 캡션 없이 이미지 자체에서 특징을 배우므로 이런 정보를 더 잘 보존할 수 있다. 다만 기존 자기지도 연구는 주로 ImageNet 같은 작고 정제된 데이터에서 이루어졌고, 데이터를 크게 늘리면 품질이 오히려 떨어지는 문제가 있었다. DINOv2는 <strong>“충분히 크고 잘 정제된 데이터 + 안정적인 대규모 학습”</strong>으로 이 한계를 넘어선다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="데이터-큐레이션-lvd-142m">데이터 큐레이션: LVD-142M</h3> <p>웹에서 수집한 약 12억 장의 정제되지 않은 이미지에서, 중복을 제거하고 ImageNet-22k 같은 정제된 데이터셋과 <strong>임베딩이 비슷한 이미지를 검색(retrieval)해 골라내는</strong> 방식으로 1.42억 장의 LVD-142M 데이터셋을 만든다. 라벨이나 메타데이터를 쓰지 않고 이미지 임베딩만으로 큐레이션하기 때문에 자기지도 학습의 전제도 지킨다.</p> <h3 id="학습-목적함수">학습 목적함수</h3> <p>교사(teacher)-학생(student) 자기증류 구조를 기반으로 두 가지 손실을 함께 쓴다. 교사는 학생의 지수이동평균(EMA)으로 갱신된다.</p> <ul> <li> <strong>이미지 수준 손실 (DINO)</strong>: 같은 이미지의 서로 다른 크롭에서 나온 <code class="language-plaintext highlighter-rouge">[CLS]</code> 토큰 표현이 교사·학생 사이에 일치하도록 학습한다.</li> <li> <strong>패치 수준 손실 (iBOT)</strong>: 학생에게 입력 패치 일부를 마스킹해서 주고, 마스킹된 위치의 패치 표현을 교사의 표현에 맞추도록 학습한다. 국소적인 정보를 배우는 데 중요하다.</li> </ul> <p>여기에 학습 안정성과 특징 품질을 높이는 여러 세부 기법을 더한다.</p> <ul> <li>이미지 수준과 패치 수준 head의 가중치를 분리(untying)</li> <li>표현 붕괴를 막는 Sinkhorn-Knopp 센터링</li> <li>배치 안에서 특징이 고르게 퍼지도록 하는 KoLeo 정규화</li> <li>학습 마지막에 짧게 해상도를 높여(518px) 세밀한 예측을 위한 적응</li> </ul> <h3 id="효율적인-대규모-학습">효율적인 대규모 학습</h3> <p>FlashAttention 기반의 빠른 attention, 서로 다른 크롭을 한 시퀀스로 묶어 처리하는 sequence packing, 확률적 깊이(stochastic depth)의 효율적 구현, FSDP를 이용한 분산 학습 등으로 10억 파라미터급 ViT-g/14 학습을 가능하게 한다.</p> <h3 id="증류">증류</h3> <p>가장 큰 ViT-g/14를 교사로 삼아 더 작은 ViT-S/B/L을 증류(distillation)로 학습한다. 작은 모델을 처음부터 학습하는 것보다 성능이 좋아서, 추론 비용이 작은 모델도 큰 모델의 특징 품질을 상당 부분 물려받는다.</p> <h2 id="실험-결과">실험 결과</h2> <ul> <li> <strong>선형 분류</strong>: 파인튜닝 없이 고정된 특징 위에 선형 분류기만 얹은 ImageNet-1k 평가에서 ViT-g/14가 86%대의 top-1 정확도를 기록해, 기존 자기지도 방법들을 크게 앞서고 OpenCLIP 등 약한 지도 방법과 대등하거나 더 나은 성능을 보였다.</li> <li> <strong>밀집 예측</strong>: 의미 분할과 단안 깊이 추정처럼 국소 정보가 중요한 태스크에서 고정된 특징 + 단순한 head만으로 강한 성능을 냈다. 이미지-텍스트로 학습한 특징이 상대적으로 약한 영역이다.</li> <li> <strong>인스턴스 검색, 비디오, 세밀 분류</strong>: 별도 학습 없이도 여러 벤치마크에서 좋은 성능을 보여 “하나의 특징으로 여러 태스크”라는 범용성을 확인했다.</li> <li> <strong>정성적 분석</strong>: 특징을 PCA로 시각화하면 서로 다른 객체 사이에서도 같은 부위(예: 여러 동물의 머리, 다리)가 비슷한 색으로 나타나, 라벨 없이 의미적 대응 관계를 학습했음을 볼 수 있다.</li> </ul> <h2 id="느낀-점">느낀 점</h2> <ul> <li>새로운 손실이나 구조보다 <strong>“어떤 데이터로, 어떻게 안정적으로 학습시키는가”</strong>가 결과를 가른다는 점이 가장 인상 깊었다. 자기지도 학습이 스케일에서 밀린 것이 아니라, 데이터 품질과 학습 안정화를 제대로 다루지 못해서였다는 주장이 설득력 있게 보였다.</li> <li>CLIP이 이미지-텍스트 정렬을 통해 전역적인 의미를 잡는다면, DINOv2는 이미지 자체에서 국소 구조까지 잡는다는 대비가 명확했다. 분할이나 깊이처럼 위치 정보가 필요한 태스크에서 고정 백본으로 DINOv2가 널리 쓰이는 이유가 납득됐다.</li> <li>데이터 큐레이션에 여전히 정제된 데이터셋(ImageNet-22k 등)이 “씨앗”으로 쓰인다는 점은 순수한 자기지도의 한계로도 읽혔다. 큐레이션 자체를 라벨 없이 어디까지 자동화할 수 있는지가 후속 연구의 관건일 것 같다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "post-논문-리뷰-segment-anything-sam",
+        
+          title: "[논문 리뷰] Segment Anything (SAM)",
+        
+        description: "프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/segment-anything/";
+          
+        },
+      },{id: "post-논문-리뷰-2d-gaussian-splatting-for-geometrically-accurate-radiance-fields",
+        
+          title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+        
+        description: "3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-matching-for-generative-modeling",
+        
+          title: "[논문 리뷰] Flow Matching for Generative Modeling",
+        
+        description: "시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-matching-for-generative-modeling/";
+          
+        },
+      },{id: "post-논문-리뷰-3d-gaussian-splatting-for-real-time-radiance-field-rendering",
+        
+          title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+        
+        description: "3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/3d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-nerf-representing-scenes-as-neural-radiance-fields-for-view-synthesis",
+        
+          title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+        
+        description: "3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/";
+          
+        },
+      },{id: "post-논문-리뷰-high-resolution-image-synthesis-with-latent-diffusion-models-stable-diffusion",
+        
+          title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)",
+        
+        description: "픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/high-resolution-image-synthesis-with-latent-diffusion-models/";
+          
+        },
+      },{id: "post-논문-리뷰-taming-transformers-for-high-resolution-image-synthesis-vq-gan",
+        
+          title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)",
+        
+        description: "VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/taming-transformers-for-high-resolution-image-synthesis/";
+          
+        },
+      },{id: "post-논문-리뷰-neural-discrete-representation-learning-vq-vae",
+        
+          title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)",
+        
+        description: "연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/neural-discrete-representation-learning/";
+          
+        },
+      },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-dinov2-learning-robust-visual-features-without-supervision",
+        
+          title: "[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision",
+        
+        description: "큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dinov2-learning-robust-visual-features-without-supervision/";
+          
+        },
+      },{id: "post-논문-리뷰-an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-vit",
+        
+          title: "[논문 리뷰] An Image is Worth 16x16 Words: Transformers for Image Recognition at...",
+        
+        description: "이미지를 16x16 패치 시퀀스로 잘라 순수 Transformer 인코더로 분류하는 ViT 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/an-image-is-worth-16x16-words/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%6E%67%79%6F%6E%67@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
