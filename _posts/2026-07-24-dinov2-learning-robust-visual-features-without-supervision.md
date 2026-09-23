@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision"
-date: 2026-07-29 09:00:00+0900
+date: 2026-07-24 09:00:00+0900
 description: 큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리
 tags: dinov2 self-supervised-learning vit foundation-model representation-learning
 categories: ["Computer Vision"]

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)"
-date: 2026-08-13 09:00:00+0900
+date: 2026-08-08 09:00:00+0900
 description: 데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리
 tags: diffusion ddpm generative-model score-matching
 categories: ["Generative AI"]
