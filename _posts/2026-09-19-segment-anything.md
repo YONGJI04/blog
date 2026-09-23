@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] Segment Anything (SAM)"
-date: 2026-09-09 09:00:00+0900
+date: 2026-09-19 09:00:00+0900
 description: 프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리
 tags: sam segmentation foundation-model zero-shot prompt
 categories: ["Computer Vision"]

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[논문 리뷰] An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale (ViT)"
-date: 2026-07-21 09:00:00+0900
+date: 2026-07-24 09:00:00+0900
 description: 이미지를 16x16 패치 시퀀스로 잘라 순수 Transformer 인코더로 분류하는 ViT 논문 정리
 tags: vit transformer image-classification pretraining
 categories: ["Computer Vision"]
