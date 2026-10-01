@@ -56,6 +56,9 @@ on:
       - "!docs/INSTALL.md"
       - "!README.md"
   workflow_dispatch:
+  schedule:
+    # daily rebuild so posts dated in the future go live on their date (00:05 UTC = 09:05 KST)
+    - cron: "5 0 * * *"
 
 permissions:
   contents: write
