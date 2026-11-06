@@ -1,0 +1,301 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] A Method for Registration of 3-D Shapes (ICP) | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="가장 가까운 점 찾기와 최소제곱 정합을 번갈아 반복해 두 3D 형상을 맞추는 ICP 알고리즘, 그 수렴 증명과 초기 자세 문제를 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/icp-registration-of-3d-shapes/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] A Method for Registration of 3-D Shapes (ICP)</h1> <p class="post-meta"> Created on October 18, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> icp   <i class="fa-solid fa-hashtag fa-sm"></i> registration   <i class="fa-solid fa-hashtag fa-sm"></i> point-cloud   <i class="fa-solid fa-hashtag fa-sm"></i> pose-estimation   <i class="fa-solid fa-hashtag fa-sm"></i> 3d-vision   ·   <i class="fa-solid fa-tag fa-sm"></i> Computer Vision </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: A Method for Registration of 3-D Shapes</li> <li> <strong>저자</strong>: Paul J. Besl, Neil D. McKay (General Motors Research Laboratories)</li> <li> <strong>학회</strong>: IEEE TPAMI, Vol. 14, No. 2, 1992</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>측정한 점마다 <strong>모델 위에서 가장 가까운 점을 찾고</strong>, 그 짝으로 <strong>최소제곱 회전·이동을 한 번에 푸는</strong> 과정을 반복해 두 3D 형상을 맞추는 ICP(Iterative Closest Point) 논문. 반복할 때마다 평균제곱오차가 줄어서 <strong>가까운 지역 최솟값으로 반드시 수렴한다</strong>는 것을 증명했다. 전역 최솟값을 찾으려고 <strong>초기 회전 후보를 여러 개 두고 돌리는 방법</strong>까지 다룬다.</p> <h2 id="배경">배경</h2> <p>3D 센서로 잰 점들은 센서 좌표계에 있고, CAD 같은 모델은 자기 좌표계에 있다. 둘을 비교하려면 먼저 데이터를 모델 위에 겹쳐 놓는 회전과 이동을 구해야 한다. 이 문제를 정합(registration)이라고 부르고, 이 논문은 6자유도 전체를 다루는 일반적인 방법을 찾는다.</p> <p>짝(대응점)을 이미 알면 문제는 쉽다. 짝지은 점 사이 거리 제곱합을 최소로 만드는 회전·이동은 닫힌 형태로 바로 나온다. 어려운 건 짝을 모를 때다. 기존 방법들은 곡률 같은 특징을 먼저 뽑아 짝을 만들었는데, 매끈한 자유곡면에는 쓸 만한 특징이 별로 없다.</p> <p>논문이 노린 응용은 검사(inspection)다. 지그로 고정하지 않은 부품을 측정하고, 측정 점들을 모델에 맞춘 뒤 얼마나 벗어났는지 본다. 그래서 특징 추출도, 곡면 미분도, 스무딩 같은 전처리도 필요 없는 방법을 목표로 했다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="무엇을-최소화하나">무엇을 최소화하나</h3> <p>데이터 점 집합 $P = {\vec p_i}$를 모델 $X$에 맞춘다. 모델은 점 집합, 선분, 삼각형 메시, 음함수·매개변수 곡선과 곡면 중 무엇이든 된다. 조건은 하나뿐이다. <strong>어떤 점이 주어지면 모델 위에서 가장 가까운 점을 구할 수 있어야 한다.</strong></p> <p>점 $\vec p$와 모델 사이 거리는 모델 위 가장 가까운 점까지의 거리로 정의한다.</p> \[d(\vec p, X) = \min_{\vec x \in X} \lVert \vec x - \vec p \rVert\] <h3 id="짝을-알-때는-쿼터니언으로-한-번에">짝을 알 때는 쿼터니언으로 한 번에</h3> <p>짝 $(\vec p_i, \vec y_i)$가 정해졌다면, 회전 $R$과 이동 $\vec q_T$는 아래 평균제곱오차를 최소로 만들어야 한다.</p> \[f(\vec q) = \frac{1}{N_p} \sum_{i=1}^{N_p} \lVert \vec y_i - R(\vec q_R)\,\vec p_i - \vec q_T \rVert^2\] <p>여기에는 Horn의 단위 쿼터니언 방법을 쓴다. 두 점 집합의 무게중심을 빼고 교차공분산 행렬 $\Sigma_{py}$를 만든다. 이걸로 4×4 대칭 행렬을 만들면, <strong>가장 큰 고윳값의 고유벡터</strong>가 최적 회전 쿼터니언이다. 이동은 $\vec q_T = \vec\mu_y - R\,\vec\mu_p$로 바로 나온다.</p> <p>계산량은 $O(N_p)$로 가볍다. 결론에서는 이 단계를 SVD 방법으로 바꾸면 n차원으로도 일반화된다고 적었다.</p> <h3 id="icp-반복">ICP 반복</h3> <p>짝을 모를 때는 “지금 위치에서 가장 가까운 점”을 짝으로 삼는다. 처음 짝은 틀리지만, 맞춘 뒤 다시 가까운 점을 찾으면 조금 더 나은 짝이 된다. 알고리즘은 네 단계를 반복한다.</p> <ol> <li> <strong>가장 가까운 점 찾기</strong>: $Y_k = \mathcal{C}(P_k, X)$. 최악 $O(N_p N_x)$, 평균 $O(N_p \log N_x)$.</li> <li> <strong>정합 계산</strong>: $(\vec q_k, d_k) = \mathcal{Q}(P_0, Y_k)$. 위의 쿼터니언 방법이다.</li> <li> <strong>적용</strong>: $P_{k+1} = \vec q_k(P_0)$.</li> <li> <strong>종료</strong>: 평균제곱오차 변화 $d_k - d_{k+1}$이 정해 둔 값 $\tau$보다 작으면 멈춘다.</li> </ol> <p>정합은 매번 처음 데이터 $P_0$를 기준으로 계산하므로, 마지막 $\vec q_k$가 그대로 전체 변환이 된다. 시간이 가장 많이 드는 건 1단계다.</p> <h3 id="수렴-정리">수렴 정리</h3> <p>핵심 정리는 <strong>ICP가 평균제곱오차 기준으로 지역 최솟값에 단조 수렴한다</strong>는 것이다. 증명은 두 부등식으로 끝난다.</p> <ul> <li>2단계의 최소제곱 정합은 현재 짝에 대한 오차 $e_k$를 늘리지 않는다($d_k \le e_k$). 아무것도 안 하는 항등 변환도 후보 중 하나이기 때문이다.</li> <li>1단계는 점마다 거리를 늘리지 않는다. 새로 찾은 점이 이전 짝보다 멀다면 “가장 가까운 점”이라는 정의에 어긋난다. 그래서 $e_{k+1} \le d_k$다.</li> </ul> <p>두 부등식을 이으면 $0 \le d_{k+1} \le e_{k+1} \le d_k \le e_k$다. 오차는 음수가 될 수 없고 줄기만 하니 어떤 값으로 수렴한다.</p> <p>실험에서는 처음 몇 번은 빠르게 줄고 최솟값 근처에서 느려졌다. 30~50번 반복하면 오차가 모델 크기의 약 0.1%까지 내려갔다고 한다.</p> <h3 id="가속-icp">가속 ICP</h3> <p>느려지는 구간에서는 정합 벡터(쿼터니언 4개와 이동 3개, 7차원)가 거의 같은 방향으로 조금씩 움직인다. 논문은 최근 세 번의 이동 방향이 서로 10° 안쪽이면 방향이 일정하다고 본다. 그때 오차를 직선과 포물선으로 근사하고, 그 최솟점까지 한 번에 건너뛴다.</p> <p>너무 멀리 뛰지 않도록 최대 이동 거리도 정해 둔다. 이렇게 하면 기본 ICP로 50번 넘게 걸리던 것이 보통 15~20번으로 줄었다.</p> <p>경사하강 같은 일반 최적화와도 비교한다. 수치 기울기 하나를 구하려면 가장 가까운 점 계산을 최소 7번 해야 한다. ICP는 반복 한 번에 한 번이면 되고, 오차가 더 큰 쪽을 탐색하느라 계산을 쓰지도 않는다.</p> <h3 id="초기-자세-문제">초기 자세 문제</h3> <p>수렴 정리가 보장하는 건 <strong>가까운</strong> 지역 최솟값까지다. 출발점이 나쁘면 엉뚱한 자세에 갇힌다. 논문은 이 문제에 한 절을 따로 쓴다. 방법은 단순하다. 서로 다른 초기 회전 여러 개에서 ICP를 돌리고 오차가 가장 작은 결과를 고른다.</p> <ul> <li> <strong>이동은 크게 신경 쓰지 않아도 된다.</strong> 데이터가 모델의 상당 부분을 덮으면 이동 후보를 여러 개 둘 필요가 없다. 무게중심만 미리 맞춰 두면 보통 20번쯤 하던 반복이 2~4번 준다.</li> <li> <strong>주축이 뚜렷한 형상은 회전 4개면 된다.</strong> 공분산 고윳값 세 개가 충분히 다르면 항등 회전과 세 주축에 대한 180° 회전으로 대부분 맞는다.</li> <li> <strong>그렇지 않으면 정다면체 회전군을 쓴다.</strong> 정사면체군 12개, 정육면체·정팔면체군 24개, 정이십면체군 60개 회전을 초기값으로 쓴다. 쿼터니언 성분을 조합해 40개나 312개 회전을 만드는 방법도 소개한다.</li> </ul> <p>반례도 직접 만든다. 구 표면에 초기 회전 축마다 가는 가시를 붙이고, 다른 자리에 조금 더 긴 가시를 붙인다. 그러면 어떤 초기 회전 집합을 정해 두어도 그 집합으로는 못 맞추는 “성게” 모양이 나온다. 공분산 고윳값이 거의 같고 작은 특징만 있는 물체가 ICP에 가장 어렵다는 뜻이다.</p> <h2 id="실험-결과">실험 결과</h2> <p>모든 프로그램은 C로 작성했고, 1.6 Mflops급 단일 프로세서 컴퓨터에서 시간을 쟀다.</p> <ul> <li>점 8개를 점 11개 집합에 짝 정보 없이 맞췄다. 6번 반복, 1초 안쪽에 끝났고 RMS 오차는 0.44 mm였다.</li> <li>잡음이 큰 점 138개를 삼각형 450개짜리 곡면에 맞췄다. 정밀도는 떨어졌지만 항등 변환에 가까운 답이 나왔다. 데이터가 이 정도로 잡음이 많고 특징이 없는데도 맞아서 놀랐다고 적었다.</li> <li>가면을 레이저로 찍은 거리 영상(삼각형 8,442개)에 점 2,546개를 맞췄다. 초기 회전 24개에서 6번씩 돌리고, 가장 좋은 것으로 끝까지 돌렸다. 90 mm 크기 물체를 어떻게 놓아도 약 10분 안에 정답으로 갔고 RMS 오차는 0.59 mm였다.</li> <li>같은 가면을 Bezier 곡면 97개로 만든 모델에 맞추자 RMS가 기대한 약 1.2 mm보다 큰 3.4 mm였다. 측정 점은 있는데 곡면이 없는 부분이 있었기 때문이다.</li> <li>점과 곡면 사이 벡터가 법선과 몇 도 이상 어긋나는 점을 빼자 기대한 오차로 돌아왔다. 측정 점 30%를 지운 데이터도 제대로 맞았다.</li> <li>지형 데이터 점 13,655개를 초기 회전 24개로 맞추는 데 약 1시간이 걸렸다.</li> </ul> <h2 id="한계">한계</h2> <p>논문이 직접 꼽은 약점들이다.</p> <ul> <li> <strong>큰 이상치에 약하다.</strong> 최소제곱이라 튀는 점 몇 개가 결과를 끌고 간다. 이상치 제거는 전처리로 따로 해야 한다.</li> <li> <strong>분할을 해 주지 않는다.</strong> 두 물체의 점이 섞여 있으면 정합이 틀리고 오차도 커진다.</li> <li> <strong>부분 정합은 비싸다.</strong> 데이터가 모델의 작은 부분만 덮으면 이동 후보까지 늘려야 한다. 비용이 $O(N_t N_q N_p N_x)$로 커진다.</li> <li>가장 가까운 점 탐색에 k-d 트리를 쓰는 방법은 다루지 않고 앞으로 할 일로 남겼다.</li> </ul> <h2 id="느낀-점">느낀 점</h2> <ul> <li>증명이 생각보다 짧았다. “최소제곱 정합은 오차를 늘리지 않는다”와 “가장 가까운 점은 더 멀어질 수 없다”를 이으면 끝난다. 다만 보장하는 범위가 가까운 최솟값까지라서, 논문의 상당 부분이 초기 자세에 들어간 이유를 알 것 같았다.</li> <li>30년도 더 된 논문인데 지금 쓰는 구조가 거의 다 들어 있다. 무게중심 맞추기, 회전 후보 여러 개, 법선과 어긋나는 짝 버리기가 이미 실험 안에 있다.</li> <li>같은 시기 Chen과 Medioni는 가장 가까운 점이 아니라 그 점의 접평면까지 거리를 줄이는 point-to-plane 방식을 냈다. 보통 점-점 방식보다 적은 반복으로 수렴해서 지금도 많이 쓴다. 뼈대는 그대로 두고 부품 하나를 바꾼 셈이다.</li> <li>한계로 꼽은 “분할을 해 주지 않는다”는 지금 봐도 핵심이다. 상자에 같은 부품이 쌓인 장면이라면 ICP만으로는 안 된다. 물체를 하나씩 떼어 내고, 대략적인 자세를 먼저 잡아 주는 단계가 앞에 있어야 한다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "post-논문-리뷰-a-method-for-registration-of-3-d-shapes-icp",
+        
+          title: "[논문 리뷰] A Method for Registration of 3-D Shapes (ICP)",
+        
+        description: "가장 가까운 점 찾기와 최소제곱 정합을 번갈아 반복해 두 3D 형상을 맞추는 ICP 알고리즘, 그 수렴 증명과 초기 자세 문제를 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/icp-registration-of-3d-shapes/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning",
+        
+          title: "[논문 리뷰] DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        
+        description: "지도학습 없이 규칙 기반 보상과 GRPO만으로 긴 추론 능력이 생겨나는 것을 보인 R1-Zero와, 이를 실용 모델로 다듬은 DeepSeek-R1 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseek-r1/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseekmath-pushing-the-limits-of-mathematical-reasoning-grpo",
+        
+          title: "[논문 리뷰] DeepSeekMath: Pushing the Limits of Mathematical Reasoning (GRPO)",
+        
+        description: "가치 함수 없이 그룹 내 상대 보상으로 advantage를 계산하는 GRPO를 제안하고, 수학 추론 특화 7B 모델을 만든 DeepSeekMath 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseekmath-grpo/";
+          
+        },
+      },{id: "post-논문-리뷰-proximal-policy-optimization-algorithms-ppo",
+        
+          title: "[논문 리뷰] Proximal Policy Optimization Algorithms (PPO)",
+        
+        description: "TRPO의 KL 제약을 확률비 클리핑으로 대신해 1차 최적화만으로 안정적인 정책 학습을 가능하게 한 PPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/proximal-policy-optimization-algorithms/";
+          
+        },
+      },{id: "post-논문-리뷰-trust-region-policy-optimization-trpo",
+        
+          title: "[논문 리뷰] Trust Region Policy Optimization (TRPO)",
+        
+        description: "정책 업데이트 폭을 KL 발산으로 묶어 성능이 단조롭게 개선되도록 보장한 TRPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/trust-region-policy-optimization/";
+          
+        },
+      },{id: "post-논문-리뷰-segment-anything-sam",
+        
+          title: "[논문 리뷰] Segment Anything (SAM)",
+        
+        description: "프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/segment-anything/";
+          
+        },
+      },{id: "post-논문-리뷰-2d-gaussian-splatting-for-geometrically-accurate-radiance-fields",
+        
+          title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+        
+        description: "3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-straight-and-fast-learning-to-generate-and-transfer-data-with-rectified-flow",
+        
+          title: "[논문 리뷰] Flow Straight and Fast: Learning to Generate and Transfer Data with...",
+        
+        description: "두 분포를 잇는 ODE의 궤적을 직선에 가깝게 반복 정제(reflow)해 적은 스텝으로 생성하는 Rectified Flow 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-straight-and-fast-rectified-flow/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-matching-for-generative-modeling",
+        
+          title: "[논문 리뷰] Flow Matching for Generative Modeling",
+        
+        description: "시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-matching-for-generative-modeling/";
+          
+        },
+      },{id: "post-논문-리뷰-3d-gaussian-splatting-for-real-time-radiance-field-rendering",
+        
+          title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+        
+        description: "3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/3d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-nerf-representing-scenes-as-neural-radiance-fields-for-view-synthesis",
+        
+          title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+        
+        description: "3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/";
+          
+        },
+      },{id: "post-논문-리뷰-high-resolution-image-synthesis-with-latent-diffusion-models-stable-diffusion",
+        
+          title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)",
+        
+        description: "픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/high-resolution-image-synthesis-with-latent-diffusion-models/";
+          
+        },
+      },{id: "post-논문-리뷰-taming-transformers-for-high-resolution-image-synthesis-vq-gan",
+        
+          title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)",
+        
+        description: "VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/taming-transformers-for-high-resolution-image-synthesis/";
+          
+        },
+      },{id: "post-논문-리뷰-neural-discrete-representation-learning-vq-vae",
+        
+          title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)",
+        
+        description: "연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/neural-discrete-representation-learning/";
+          
+        },
+      },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-dinov2-learning-robust-visual-features-without-supervision",
+        
+          title: "[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision",
+        
+        description: "큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dinov2-learning-robust-visual-features-without-supervision/";
+          
+        },
+      },{id: "post-논문-리뷰-an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-vit",
+        
+          title: "[논문 리뷰] An Image is Worth 16x16 Words: Transformers for Image Recognition at...",
+        
+        description: "이미지를 16x16 패치 시퀀스로 잘라 순수 Transformer 인코더로 분류하는 ViT 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/an-image-is-worth-16x16-words/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%6E%67%79%6F%6E%67@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
