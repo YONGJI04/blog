@@ -1,0 +1,323 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] PoseCNN: 6D Object Pose Estimation in Cluttered Scenes | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="물체 중심 투표로 위치를, 쿼터니언 회귀로 회전을 따로 구하고, 대칭 물체용 ShapeMatch-Loss와 YCB-Video 데이터셋을 함께 낸 PoseCNN 논문 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/posecnn/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] PoseCNN: 6D Object Pose Estimation in Cluttered Scenes</h1> <p class="post-meta"> Created on October 27, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> posecnn   <i class="fa-solid fa-hashtag fa-sm"></i> 6d-pose   <i class="fa-solid fa-hashtag fa-sm"></i> pose-estimation   <i class="fa-solid fa-hashtag fa-sm"></i> ycb-video   <i class="fa-solid fa-hashtag fa-sm"></i> add-s   <i class="fa-solid fa-hashtag fa-sm"></i> symmetric-objects   ·   <i class="fa-solid fa-tag fa-sm"></i> Computer Vision </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: PoseCNN: A Convolutional Neural Network for 6D Object Pose Estimation in Cluttered Scenes</li> <li> <strong>저자</strong>: Yu Xiang, Tanner Schmidt, Venkatraman Narayanan, Dieter Fox (NVIDIA Research, University of Washington, CMU)</li> <li> <strong>학회</strong>: RSS 2018</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>물체의 6D 자세를 <strong>이동과 회전으로 나눠</strong> 구하는 CNN 논문. 이동은 픽셀마다 물체 중심 방향을 예측해 <strong>투표로 중심을 찾고</strong>, 거리를 따로 예측해 구한다. 회전은 쿼터니언으로 바로 회귀한다. 대칭 물체를 위한 <strong>ShapeMatch-Loss</strong>와, 지금도 표준으로 쓰는 <strong>YCB-Video 데이터셋</strong>과 ADD/ADD-S 평가 방식을 함께 정리했다.</p> <h2 id="배경">배경</h2> <p>이전 방법은 크게 둘이었다. 특징점 매칭은 무늬가 있어야 점을 찾을 수 있어서, 무늬 없는 물체에는 못 쓴다. 템플릿 매칭은 무늬 없는 물체도 되지만, 물체가 가려지면 유사도 점수가 뚝 떨어진다.</p> <p>픽셀마다 물체 좌표계의 3D 좌표를 회귀해서 2D-3D 대응을 만드는 방법도 있었다. 그런데 이 방법은 대칭 물체에서 막힌다. 대칭이면 같은 픽셀이 여러 3D 좌표에 해당할 수 있기 때문이다.</p> <p>대칭은 학습 쪽에서도 문제다. 그릇이나 나무 블록은 서로 다른 회전이 똑같아 보인다. 평가할 때는 대칭을 고려하면서, 학습할 때는 무시하는 경우가 많았다. 그러면 맞는 답을 냈는데도 손실이 크게 나오는, 앞뒤가 안 맞는 신호를 네트워크가 받는다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="전체-구조">전체 구조</h3> <p>입력은 RGB 이미지 한 장이고, 출력은 물체 좌표계에서 카메라 좌표계로 가는 회전 $R$과 이동 $T$다. 이동은 물체가 이미지 어디에, 얼마나 크게 보이는지를 정한다. 회전은 겉모습을 바꾼다. 성질이 다르니 따로 추정하자는 게 출발점이다.</p> <p>백본은 VGG16의 합성곱 13층이다. 여기서 나온 특징을 세 갈래가 나눠 쓴다.</p> <ul> <li> <strong>의미 분할</strong>: 픽셀마다 어떤 물체인지 분류한다. 1/8, 1/16 크기 특징을 합쳐 원래 크기로 키운다(FCN 방식). 바운딩 박스보다 가려짐에 강하다.</li> <li> <strong>이동 추정</strong>: 픽셀마다 물체 중심 방향과 중심까지의 거리를 예측한다.</li> <li> <strong>회전 회귀</strong>: 물체 영역의 특징을 잘라 쿼터니언을 예측한다.</li> </ul> <h3 id="중심-투표로-이동-구하기">중심 투표로 이동 구하기</h3> <p>$T$를 이미지 특징에서 바로 회귀하면, 물체가 이미지 어디에 나올지 몰라 일반화가 안 된다. 같은 종류 물체가 여러 개일 때도 못 쓴다. 대신 이미지 위 중심 $c = (c_x, c_y)$와 깊이 $T_z$를 찾는다. 카메라 내부 파라미터를 알면 나머지는 핀홀 투영 식으로 풀린다.</p> \[c_x = f_x \frac{T_x}{T_z} + p_x, \qquad c_y = f_y \frac{T_y}{T_z} + p_y\] <p>중심을 키포인트처럼 바로 찾으면, 중심이 가려졌을 때 실패한다. 그래서 픽셀 $p$마다 <strong>중심을 향하는 단위 벡터</strong>와 깊이를 예측한다.</p> \[(x, y) \rightarrow \left( n_x = \frac{c_x - x}{\lVert c - p \rVert},\ n_y = \frac{c_y - y}{\lVert c - p \rVert},\ T_z \right)\] <p>변위 벡터 $c - p$ 대신 단위 벡터를 쓰는 건 크기에 무관해서 학습이 쉽기 때문이다. 실험으로 확인했다고 한다.</p> <p>허프 투표 층이 이걸 모은다. 분할 결과로 물체 픽셀만 골라, 각 픽셀이 예측한 방향의 직선 위에 표를 준다. 표가 가장 많이 모인 곳이 중심이다. 같은 물체가 여러 개면 NMS를 쓴다.</p> <p>중심에 표를 준 픽셀들의 깊이 예측을 평균 내 $T_z$로 쓴다. 이 픽셀들을 감싸는 사각형이 회전 갈래의 관심 영역이 된다. <strong>중심이 다른 물체에 가려져 있어도 보이는 픽셀들이 그쪽을 가리키면 찾을 수 있다</strong>는 게 이 설계의 장점이다.</p> <h3 id="회전-회귀와-두-가지-손실">회전 회귀와 두 가지 손실</h3> <p>투표에서 나온 사각형으로 특징을 RoI pooling해서 FC 층 세 개에 넣는다. 마지막 층은 물체 종류마다 쿼터니언 4개를 낸다. 손실은 두 가지를 제안한다.</p> <p><strong>PoseLoss</strong>는 모델 점들을 예측 회전과 정답 회전으로 각각 돌려서, 같은 점끼리의 거리 제곱 평균을 잰다.</p> \[\mathrm{PLOSS}(\tilde q, q) = \frac{1}{2m} \sum_{x \in \mathcal{M}} \lVert R(\tilde q)x - R(q)x \rVert^2\] <p>대칭 물체에서는 정답 회전이 여러 개라서, 맞는 답에도 벌점을 준다. 대칭을 직접 지정해 주면 고칠 수 있지만, 논문은 대칭 지정이 필요 없는 다른 손실을 낸다.</p> <p><strong>ShapeMatch-Loss</strong>는 같은 점끼리가 아니라 <strong>가장 가까운 점</strong>까지 거리를 잰다.</p> \[\mathrm{SLOSS}(\tilde q, q) = \frac{1}{2m} \sum_{x_1 \in \mathcal{M}} \min_{x_2 \in \mathcal{M}} \lVert R(\tilde q)x_1 - R(q)x_2 \rVert^2\] <p>ICP의 거리와 같은 꼴이다. 두 모양이 겹치기만 하면 0이 되므로, 대칭으로 똑같아 보이는 회전에는 벌점이 없다.</p> <h3 id="ycb-video-데이터셋">YCB-Video 데이터셋</h3> <p>기존 LINEMOD는 물체 15개에 물체마다 사람이 표시한 이미지 약 1,000장이었다. 평가용으로는 괜찮지만 딥러닝 학습에는 수백 배 모자랐다.</p> <p>YCB-Video는 YCB 물체 중 21개를 골라 영상 92개, 총 <strong>133,827프레임</strong>에 자세를 붙였다. 프레임마다 사람이 표시하지 않았다. 영상 첫 프레임에서만 자세를 손으로 정하고, 깊이 영상을 따라 카메라 궤적을 추적한 뒤 전역 최적화로 다듬었다.</p> <p>장면마다 물체가 3~9개(평균 4.47개)라 서로 많이 가린다. 저자들은 롤링 셔터, 3D 모델 오차, RGB와 깊이의 시간 차이 때문에 정답 자세에도 오차가 있다고 적었다.</p> <h3 id="add와-add-s">ADD와 ADD-S</h3> <p>평가 지표도 손실과 같은 생각에서 나온다. ADD는 정답 자세와 예측 자세로 옮긴 모델 점들 사이 평균 거리다.</p> \[\mathrm{ADD} = \frac{1}{m} \sum_{x \in \mathcal{M}} \lVert (Rx + T) - (\tilde R x + \tilde T) \rVert\] <p>대칭 물체는 가장 가까운 점까지 거리로 바꾼 ADD-S를 쓴다. 고정 임계값 하나만 쓰면 틀린 자세가 얼마나 틀렸는지 안 보인다. 그래서 임계값을 0부터 10 cm까지 바꿔 가며 정확도 곡선을 그리고, 곡선 아래 넓이(AUC)를 점수로 쓴다.</p> <h2 id="실험-결과">실험 결과</h2> <p>YCB-Video는 영상 80개로 학습하고, 남은 12개 영상의 키프레임 2,949장으로 평가했다. 무작위로 물체를 놓아 만든 합성 이미지 80,000장도 학습에 썼다. 깊이가 있을 때는 ICP로 다듬었다. 렌더링한 모델과 관측 깊이를 픽셀 단위로 짝짓는 point-to-plane ICP이고, 지역 최솟값을 피하려고 자세를 흔들어 여러 번 돌린다.</p> <table> <thead> <tr> <th>YCB-Video (AUC)</th> <th>ADD</th> <th>ADD-S</th> </tr> </thead> <tbody> <tr> <td>3D 좌표 회귀 (RGB)</td> <td>15.1</td> <td>29.8</td> </tr> <tr> <td><strong>PoseCNN (RGB)</strong></td> <td><strong>53.7</strong></td> <td><strong>75.9</strong></td> </tr> <tr> <td>3D 좌표 회귀 + ICP</td> <td>74.5</td> <td>90.1</td> </tr> <tr> <td><strong>PoseCNN + ICP</strong></td> <td><strong>79.3</strong></td> <td><strong>93.0</strong></td> </tr> </tbody> </table> <ul> <li>색 이미지만 쓸 때 3D 좌표 회귀보다 크게 앞선다. 좌표 회귀는 좌표가 조금 틀려도 자세가 멀리 튀는데, PoseCNN은 중심 위치가 이동을 잡아 준다.</li> <li>ICP를 붙이면 둘 다 크게 오른다. PoseCNN이 더 좋은 초기값을 주기 때문에 ICP 결과도 더 좋다.</li> <li>작고 무늬 없는 참치 캔이 어려웠고, 겉모습이 같은 큰 클램프와 더 큰 클램프를 헷갈렸다.</li> <li>대칭인 나무 블록과 큰 클램프에서 PoseLoss는 회전 오차가 0~180°에 고루 퍼졌다. ShapeMatch-Loss는 대칭에 해당하는 0°와 180°에 모였다.</li> </ul> <p>물체가 심하게 가려진 OccludedLINEMOD에서는 ADD 10% 기준 정확도를 비교했다. 깊이를 쓰는 기존 방법들의 평균이 56.6~76.7%였다. PoseCNN+ICP는 <strong>78.0%</strong> 로 가장 높았다.</p> <p>가장 크게 오른 건 대칭 물체였다. Eggbox는 기존 최고 65.5%에서 72.2%로, Glue는 73.8%에서 76.7%로 올랐다. 색 이미지만 쓴 PoseCNN은 24.9%에 그쳤다. 이 데이터셋의 임계값은 보통 2 cm보다 작아서, 가려진 장면에서 색만으로 맞추기 어렵다고 저자들은 설명한다.</p> <h2 id="느낀-점">느낀 점</h2> <ul> <li>ShapeMatch-Loss가 <a href="/blog/2026/icp-registration-of-3d-shapes/">ICP</a>의 “가장 가까운 점” 거리를 그대로 손실로 쓴 것이라 반가웠다. 대칭을 직접 적어 주지 않아도 모양만 맞으면 벌점이 없다. 다만 저자들도 결론에서 이 손실이 ICP처럼 지역 최솟값에 빠질 때가 있다고 인정했다.</li> <li>ICP의 위치도 바뀌었다. ICP 논문에서는 초기 회전 후보를 여러 개 두는 문제를 붙잡고 있었는데, 여기서는 네트워크가 그 초기값을 주고 ICP는 다듬기만 한다. 같은 ICP인데 초기값이 좋아지자 ADD-S AUC가 90.1에서 93.0으로 올랐다.</li> <li>중심 투표는 <a href="/blog/2026/model-globally-match-locally-ppf/">PPF</a>의 투표와 생각이 같다. 보이는 부분이 각자 정답 쪽에 표를 던지니, 가려져도 버틴다. 손으로 만든 특징 대신 네트워크가 표를 던진다는 점만 다르다.</li> <li>상자에 같은 부품이 쌓인 장면이라면 물체 종류는 하나이고 개체만 여러 개다. 그때는 분류보다, 붙어 있는 개체들을 중심 투표와 NMS가 얼마나 잘 나누는지가 더 중요할 것 같다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "post-논문-리뷰-posecnn-6d-object-pose-estimation-in-cluttered-scenes",
+        
+          title: "[논문 리뷰] PoseCNN: 6D Object Pose Estimation in Cluttered Scenes",
+        
+        description: "물체 중심 투표로 위치를, 쿼터니언 회귀로 회전을 따로 구하고, 대칭 물체용 ShapeMatch-Loss와 YCB-Video 데이터셋을 함께 낸 PoseCNN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/posecnn/";
+          
+        },
+      },{id: "post-논문-리뷰-model-globally-match-locally-point-pair-features",
+        
+          title: "[논문 리뷰] Model Globally, Match Locally (Point Pair Features)",
+        
+        description: "모델의 모든 점 쌍을 해시 테이블에 넣어 두고, 장면 점 쌍으로 2차원 표에 투표해 초기 자세 없이 3D 물체의 6자유도 자세를 찾는 PPF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/model-globally-match-locally-ppf/";
+          
+        },
+      },{id: "post-논문-리뷰-a-method-for-registration-of-3-d-shapes-icp",
+        
+          title: "[논문 리뷰] A Method for Registration of 3-D Shapes (ICP)",
+        
+        description: "가장 가까운 점 찾기와 최소제곱 정합을 번갈아 반복해 두 3D 형상을 맞추는 ICP 알고리즘, 그 수렴 증명과 초기 자세 문제를 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/icp-registration-of-3d-shapes/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning",
+        
+          title: "[논문 리뷰] DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        
+        description: "지도학습 없이 규칙 기반 보상과 GRPO만으로 긴 추론 능력이 생겨나는 것을 보인 R1-Zero와, 이를 실용 모델로 다듬은 DeepSeek-R1 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseek-r1/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseekmath-pushing-the-limits-of-mathematical-reasoning-grpo",
+        
+          title: "[논문 리뷰] DeepSeekMath: Pushing the Limits of Mathematical Reasoning (GRPO)",
+        
+        description: "가치 함수 없이 그룹 내 상대 보상으로 advantage를 계산하는 GRPO를 제안하고, 수학 추론 특화 7B 모델을 만든 DeepSeekMath 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseekmath-grpo/";
+          
+        },
+      },{id: "post-논문-리뷰-proximal-policy-optimization-algorithms-ppo",
+        
+          title: "[논문 리뷰] Proximal Policy Optimization Algorithms (PPO)",
+        
+        description: "TRPO의 KL 제약을 확률비 클리핑으로 대신해 1차 최적화만으로 안정적인 정책 학습을 가능하게 한 PPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/proximal-policy-optimization-algorithms/";
+          
+        },
+      },{id: "post-논문-리뷰-trust-region-policy-optimization-trpo",
+        
+          title: "[논문 리뷰] Trust Region Policy Optimization (TRPO)",
+        
+        description: "정책 업데이트 폭을 KL 발산으로 묶어 성능이 단조롭게 개선되도록 보장한 TRPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/trust-region-policy-optimization/";
+          
+        },
+      },{id: "post-논문-리뷰-segment-anything-sam",
+        
+          title: "[논문 리뷰] Segment Anything (SAM)",
+        
+        description: "프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/segment-anything/";
+          
+        },
+      },{id: "post-논문-리뷰-2d-gaussian-splatting-for-geometrically-accurate-radiance-fields",
+        
+          title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+        
+        description: "3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-straight-and-fast-learning-to-generate-and-transfer-data-with-rectified-flow",
+        
+          title: "[논문 리뷰] Flow Straight and Fast: Learning to Generate and Transfer Data with...",
+        
+        description: "두 분포를 잇는 ODE의 궤적을 직선에 가깝게 반복 정제(reflow)해 적은 스텝으로 생성하는 Rectified Flow 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-straight-and-fast-rectified-flow/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-matching-for-generative-modeling",
+        
+          title: "[논문 리뷰] Flow Matching for Generative Modeling",
+        
+        description: "시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-matching-for-generative-modeling/";
+          
+        },
+      },{id: "post-논문-리뷰-3d-gaussian-splatting-for-real-time-radiance-field-rendering",
+        
+          title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+        
+        description: "3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/3d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-nerf-representing-scenes-as-neural-radiance-fields-for-view-synthesis",
+        
+          title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+        
+        description: "3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/";
+          
+        },
+      },{id: "post-논문-리뷰-high-resolution-image-synthesis-with-latent-diffusion-models-stable-diffusion",
+        
+          title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)",
+        
+        description: "픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/high-resolution-image-synthesis-with-latent-diffusion-models/";
+          
+        },
+      },{id: "post-논문-리뷰-taming-transformers-for-high-resolution-image-synthesis-vq-gan",
+        
+          title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)",
+        
+        description: "VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/taming-transformers-for-high-resolution-image-synthesis/";
+          
+        },
+      },{id: "post-논문-리뷰-neural-discrete-representation-learning-vq-vae",
+        
+          title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)",
+        
+        description: "연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/neural-discrete-representation-learning/";
+          
+        },
+      },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-dinov2-learning-robust-visual-features-without-supervision",
+        
+          title: "[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision",
+        
+        description: "큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dinov2-learning-robust-visual-features-without-supervision/";
+          
+        },
+      },{id: "post-논문-리뷰-an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-vit",
+        
+          title: "[논문 리뷰] An Image is Worth 16x16 Words: Transformers for Image Recognition at...",
+        
+        description: "이미지를 16x16 패치 시퀀스로 잘라 순수 Transformer 인코더로 분류하는 ViT 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/an-image-is-worth-16x16-words/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%6E%67%79%6F%6E%67@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
