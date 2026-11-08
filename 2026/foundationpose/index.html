@@ -1,0 +1,356 @@
+<!DOCTYPE html> <html lang="ko"> <head> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <title> [논문 리뷰] FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects | JIYONG CHOI </title> <meta name="author" content="JIYONG CHOI"> <meta name="description" content="대규모 합성 데이터로 한 번 학습한 렌더링-비교 네트워크로, CAD나 참조 이미지만 있으면 처음 보는 물체의 6D 자세를 추정하고 추적하는 FoundationPose 논문 정리"> <meta name="keywords" content="research, paper review, ai, machine learning, portfolio"> <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;"> <style>
+  :root {
+    --max-content-width: 930px;
+  }
+</style> <link rel="stylesheet" href="/blog/assets/css/tailwind.css?v=50c64c15cbb9fd1ce6056fdb8bcb4b62"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.css" integrity="sha256-zTN0r+0OKaIv2xqeNNIYxNk0pWJ6+IqPGc1iDgVzWF0=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css" integrity="sha256-MVopmdyC2tYTiJ8wlktf0uh0v4NgT+vNdyVFepi7Q0c=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.5/css/academicons.min.css" integrity="sha256-SzrCOBJbGVFMahewkgjwnApaV2+av1DwMAA+/QGLyZw=" crossorigin="anonymous"> <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/scholar-icons@1.0.3/css/scholar-icons.css" integrity="sha256-VY3hHVj/hNX3fYG6wtbA6TcKJQl7+FthzGSyIB64klY=" crossorigin="anonymous"> <link defer rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:100,300,400,500,700|Material+Icons&amp;display=swap"> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-github.css?v=591dab5a4e56573bf4ef7fd332894c99" media="" id="highlight_theme_light"> <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22&gt;&lt;text%20y=%22.9em%22%20font-size=%2290%22&gt;%F0%9F%93%84&lt;/text&gt;&lt;/svg&gt;"> <link rel="stylesheet" href="/blog/assets/css/main.css?v=f0b101217084a90093badfe99ff9a7d1"> <link rel="canonical" href="https://yongji04.github.io/blog/2026/foundationpose/"> <script src="/blog/assets/js/theme.js?v=7af685e2ba20b37fef545c97b8064050"></script> <link defer rel="stylesheet" href="/blog/assets/css/jekyll-pygments-themes-native.css?v=5847e5ed4a4568527aa6cfab446049ca" media="none" id="highlight_theme_dark"> <script>
+    initTheme();
+  </script> </head> <body class="fixed-top-nav "> <header> <nav id="navbar" class="navbar navbar-light navbar-expand-sm fixed-top" role="navigation"> <div class="container"> <a class="navbar-brand title font-weight-lighter" href="/blog/"> JIYONG CHOI </a> <button class="navbar-toggler collapsed navbar-toggler-main" type="button" data-nav-toggle="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar top-bar"></span> <span class="icon-bar middle-bar"></span> <span class="icon-bar bottom-bar"></span> </button> <div class="collapse navbar-collapse navbar-collapse-main" id="navbarNav"> <ul class="navbar-nav navbar-menu-list flex-nowrap"> <li class="nav-item "> <a class="nav-link" href="/blog/">about </a> </li> <li class="nav-item "> <a class="nav-link" href="/blog/blog/">blog </a> </li> <li class="nav-item"> <button id="search-toggle" type="button" title="Search" aria-label="Open search"> <span class="nav-link">ctrl k <i class="fa-solid fa-magnifying-glass"></i></span> </button> </li> <li class="toggle-container"> <button id="light-toggle" type="button" title="Change theme" aria-label="Change color theme"> <i class="fa-half-sun-moon" id="light-toggle-system"></i> <i class="fa-solid fa-moon" id="light-toggle-dark"></i> <i class="fa-solid fa-sun" id="light-toggle-light"></i> </button> </li> </ul> </div> </div> </nav> <progress id="progress" value="0"> <div class="progress-container"> <span class="progress-bar"></span> </div> </progress> </header> <div class="container mt-5" role="main"> <div class="row"> <div class="col-sm-3"> <nav id="toc-sidebar" class="sticky-top toc toc-sidebar" aria-label="Table of contents" data-toc-collapse="expanded" data-toc-collapse-depth=""></nav> </div> <div class="col-sm-9"> <div class="post"> <header class="post-header"> <h1 class="post-title">[논문 리뷰] FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects</h1> <p class="post-meta"> Created on November 08, 2026 </p> <p class="post-tags"> <i class="fa-solid fa-calendar fa-sm"></i> 2026   ·   <i class="fa-solid fa-hashtag fa-sm"></i> foundationpose   <i class="fa-solid fa-hashtag fa-sm"></i> 6d-pose   <i class="fa-solid fa-hashtag fa-sm"></i> novel-object   <i class="fa-solid fa-hashtag fa-sm"></i> render-and-compare   <i class="fa-solid fa-hashtag fa-sm"></i> pose-tracking   <i class="fa-solid fa-hashtag fa-sm"></i> synthetic-data   ·   <i class="fa-solid fa-tag fa-sm"></i> Computer Vision </p> </header> <article class="post-content"> <div id="markdown-content"> <ul> <li> <strong>논문</strong>: FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects</li> <li> <strong>저자</strong>: Bowen Wen, Wei Yang, Jan Kautz, Stan Birchfield (NVIDIA)</li> <li> <strong>학회</strong>: CVPR 2024</li> </ul> <h2 id="한-줄-요약">한 줄 요약</h2> <p>처음 보는 물체라도 <strong>CAD 모델이 있거나, 참조 이미지 16장 정도만 있으면</strong> 따로 학습하지 않고 6D 자세를 추정하고 추적하는 모델. 자세 후보를 수백 개 뿌리고, 후보마다 <strong>물체를 렌더링해서 실제 관측과 비교하며</strong> 자세를 고친다. 그다음 <strong>후보끼리 서로 비교해</strong> 가장 맞는 것을 고른다. 학습은 LLM과 확산 모델로 질감을 입힌 대규모 합성 데이터로만 했다.</p> <h2 id="배경">배경</h2> <p><a href="/blog/2026/posecnn/">PoseCNN</a>이나 <a href="/blog/2026/ffb6d/">FFB6D</a> 같은 인스턴스 수준 방법은 학습한 물체만 찾는다. 카테고리 수준 방법은 정해진 카테고리 안에서만 일반화되고, 학습 데이터를 만들기도 어렵다. 그래서 테스트 때 처음 보는 물체를 바로 다루는 연구가 늘었는데, 설정이 둘로 갈렸다.</p> <ul> <li> <strong>모델 기반</strong>: 질감이 있는 CAD 모델을 준다. MegaPose, <a href="/blog/2026/sam-6d/">SAM-6D</a>가 여기에 속한다.</li> <li> <strong>모델 없음(model-free)</strong>: CAD 대신 물체를 찍은 참조 이미지 몇 장을 준다. OnePose, FS6D 같은 방법이 있다.</li> </ul> <p>현장에서는 CAD가 있을 때도, 없을 때도 있다. 영상에서 자세를 계속 따라가는 추적(tracking)도 따로 연구돼 왔다. 이 논문은 이 넷(모델 기반·없음 × 추정·추적)을 한 모델로 묶는다.</p> <h2 id="제안-방법">제안 방법</h2> <h3 id="llm으로-질감을-입힌-합성-데이터">LLM으로 질감을 입힌 합성 데이터</h3> <p>일반화의 열쇠를 데이터 다양성으로 본다. 3D 모델은 Objaverse-LVIS(1,156개 카테고리, 4만 개 넘는 물체)와 Google Scanned Objects에서 가져온다.</p> <p>Objaverse는 모양은 괜찮은데 질감 품질이 들쭉날쭉하다. 앞선 FS6D는 ImageNet 사진을 무작위로 붙였는데, 이음매가 보이고 어색했다. 이 논문은 두 단계 프롬프트를 쓴다.</p> <ol> <li>ChatGPT에게 물체 태그를 주고 “이 물체가 어떻게 생겼을지” 설명하게 한다.</li> <li>그 설명을 확산 모델(TexFusion)에 프롬프트로 넣어 물체 모양에 맞는 질감을 만든다.</li> </ol> <p>사람이 프롬프트를 쓰지 않아도 되니 물체마다 여러 스타일을 자동으로 만들 수 있다. 장면은 NVIDIA Isaac Sim에서 경로 추적으로 렌더링한다. 물체 70~90개를 보이지 않는 벽이 있는 판 위에 떨어뜨려 물리적으로 그럴듯하게 쌓는다.</p> <p>조명, 카메라, 배경, 물체 크기도 바꾸고, 금속성과 반사 같은 재질 속성도 무작위로 준다. 장면 약 60만 개, 이미지 약 120만 장이 나왔다.</p> <h3 id="참조-이미지로-물체-표현-만들기">참조 이미지로 물체 표현 만들기</h3> <p>CAD가 없을 때는 참조 이미지로 물체를 표현해야 렌더링할 수 있다. 여기서는 <a href="/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/">NeRF</a>처럼 밀도를 쓰지 않고, SDF(부호 있는 거리 함수)로 모양을 학습한다. 깊이 렌더링 품질이 좋고 밀도 임계값을 고를 필요가 없어서다.</p> <p>물체마다 따로 학습하는데, 2천 스텝 정도라 보통 몇 초면 끝난다. 학습이 끝나면 marching cubes로 질감 있는 메시를 한 번 뽑아 둔다. 이후로는 CAD가 있는 경우와 똑같이 메시를 렌더링한다. 그래서 뒤쪽 모듈은 두 설정에서 완전히 같다.</p> <h3 id="자세-후보-만들기">자세 후보 만들기</h3> <p>검출은 Mask R-CNN이나 CNOS 같은 기존 방법에 맡긴다. 이동은 검출 박스 안 깊이의 중앙값 위치로 초기화한다. 회전은 물체를 둘러싼 정이십면체 구 위 42개 시점에 화면 내 회전 12개를 곱해 <strong>504개 후보</strong>를 만든다.</p> <h3 id="렌더링하고-비교해서-고치기">렌더링하고 비교해서 고치기</h3> <p>후보 자세마다 물체를 렌더링하고, 관측 이미지에서 해당 영역을 잘라 둘을 네트워크에 넣는다. 자르는 위치가 중요하다. 2D 검출 박스로 고정해 자르지 않는다. 후보 자세로 물체 원점을 투영한 곳을 중심으로, 물체 지름보다 조금 크게 자른다.</p> <p>이렇게 하면 이동이 틀린 후보는 잘린 이미지에서도 물체가 한쪽으로 쏠려 보인다. 네트워크는 그걸 보고 이동을 고칠 수 있다.</p> <p>네트워크는 두 RGBD 입력을 같은 CNN으로 인코딩하고 패치로 나눠 트랜스포머에 넣는다. 출력은 카메라 좌표계 기준 이동 변화 $\Delta t$와 회전 변화 $\Delta R$이다.</p> \[t^{+} = t + \Delta t, \qquad R^{+} = \Delta R \otimes R\] <p>이동과 회전을 따로 적용하는 게 포인트다. 4×4 변환 하나로 합쳐 업데이트하면 회전을 바꿀 때 이동도 같이 움직여 학습이 불안정했다고 한다. 테스트 때는 이 보정을 5번 반복한다.</p> <h3 id="후보끼리-비교해서-고르기">후보끼리 비교해서 고르기</h3> <p>보정한 후보 504개 중 하나를 골라야 한다. 흔한 방법은 후보마다 “관측과 얼마나 맞나” 점수를 따로 매기는 것이다. 이 논문은 비교를 두 층으로 한다.</p> <ol> <li>후보마다 렌더링과 관측을 비교해 512차원 임베딩을 만든다.</li> <li>모든 후보의 임베딩을 한 시퀀스로 묶어 셀프 어텐션을 돌린 뒤 점수를 낸다.</li> </ol> <p>절대 점수를 맞히는 것보다, 다른 후보들과 견줘서 “이게 더 낫다”를 판단하는 게 쉽다는 생각이다. 학습은 트리플릿 손실로 한다. 정답에 가까운 후보가 먼 후보보다 점수가 높게 나오도록 한다.</p> <p>양쪽 다 정답에서 멀면 어느 쪽이 나은지 애매하다. 그래서 정답 시점에 충분히 가까운 후보만 양성 쪽에 쓴다.</p> <h2 id="실험-결과">실험 결과</h2> <p>아래는 모두 논문에 실린 실험이다.</p> <p><strong>모델 기반(BOP, AR).</strong> 표의 세 방법 모두 Mask R-CNN 검출을 썼다.</p> <table> <thead> <tr> <th>방법</th> <th>처음 보는 물체</th> <th>LM-O</th> <th>T-LESS</th> <th>YCB-V</th> <th>평균</th> </tr> </thead> <tbody> <tr> <td>SurfEmb + ICP</td> <td>✗ (해당 물체로 학습)</td> <td>75.8</td> <td>82.8</td> <td>80.6</td> <td>79.7</td> </tr> <tr> <td>MegaPose-RGBD</td> <td>✓</td> <td>58.3</td> <td>54.3</td> <td>63.3</td> <td>58.6</td> </tr> <tr> <td><strong>FoundationPose</strong></td> <td>✓</td> <td><strong>78.8</strong></td> <td><strong>83.0</strong></td> <td><strong>88.0</strong></td> <td><strong>83.3</strong></td> </tr> </tbody> </table> <p>처음 보는 물체를 다루면서도, 그 물체로 학습하고 ICP까지 붙인 SurfEmb보다 높았다.</p> <p><strong>모델 없음(참조 이미지 16장).</strong> YCB-Video에서 ADD-S/ADD AUC가 97.4/91.5였다. 대상 데이터로 파인튜닝한 FS6D는 88.4/42.1이었다. LINEMOD ADD-0.1d는 99.9%였고, FS6D에 ICP를 붙인 결과는 91.5%였다. 참조 이미지를 4장만 줘도 16장을 쓴 FS6D보다 좋았고, 12장 정도에서 포화했다.</p> <p><strong>추적.</strong> YCB-Video에서 CAD를 준 경우 ADD/ADD-S AUC 96.0/97.9였다. 같은 물체로 학습한 se(3)-TrackNet은 93.0/95.7이었다. 참조 이미지만 준 경우도 93.7/97.5였다.</p> <p><strong>절제 실험(YCB-V, 모델 없음, AUC).</strong></p> <table> <thead> <tr> <th>설정</th> <th>ADD</th> <th>ADD-S</th> </tr> </thead> <tbody> <tr> <td>전체</td> <td><strong>91.52</strong></td> <td><strong>97.40</strong></td> </tr> <tr> <td>LLM 질감 증강 없음</td> <td>90.83</td> <td>97.38</td> </tr> <tr> <td>트랜스포머 대신 CNN·선형 층</td> <td>90.77</td> <td>97.33</td> </tr> <tr> <td>후보끼리 비교 없음</td> <td>89.05</td> <td>96.67</td> </tr> <tr> <td>트리플릿 대신 InfoNCE</td> <td>89.39</td> <td>97.29</td> </tr> </tbody> </table> <p>후보끼리 비교하는 단계를 빼면 가장 크게 떨어졌다. 학습 데이터 양을 늘려 본 실험에서는 약 100만($10^6$) 근처에서 이득이 포화했다.</p> <p><strong>속도.</strong> RTX 3090에서 물체 하나 자세 추정에 약 1.3초가 걸린다. 초기화 4 ms, 보정 0.88초, 선택 0.42초다. 추적은 후보가 하나뿐이고 보정 한 번이면 되니 약 32 Hz로 돈다. 처음에 한 번 추정하고 이후 추적으로 넘어가는 식으로 쓰면 된다.</p> <p><strong>한계.</strong> 2D 검출을 밖에 맡기는데, 잘못 찾거나 놓친 검출이 자주 병목이 됐다고 적었다. 무늬가 없고 많이 가려졌으며 모서리 단서까지 적으면 회전을 틀리는 실패 예도 보여 준다.</p> <h2 id="느낀-점">느낀 점</h2> <ul> <li> <a href="/blog/2026/sam-6d/">SAM-6D</a>와 같은 문제를 반대 방향에서 푼다. SAM-6D는 관측 점과 CAD 점의 짝을 찾아 자세를 계산한다. FoundationPose는 짝을 찾지 않고, 자세를 가정해 그려 본 뒤 관측과 맞는지 비교한다. 무늬 없는 물체에서는 짝 찾기가 불안하니, 그려서 비교하는 쪽이 유리한 장면이 있을 것 같다.</li> <li>504개 후보에서 출발하는 건 <a href="/blog/2026/icp-registration-of-3d-shapes/">ICP</a> 논문이 정다면체 회전군으로 초기 회전을 여러 개 뿌리던 것과 같은 생각이다. 지역 보정은 어디서 시작하느냐에 달렸으니 출발점을 넓게 깐다. 30년이 지나도 이 구조는 그대로고, 보정과 선택을 네트워크가 맡게 됐다.</li> <li>합성 데이터 만드는 방식이 눈에 들어왔다. 물리 시뮬레이션으로 물체 수십 개를 떨어뜨리고, 금속성과 반사까지 무작위로 바꾼다. 상자에 쌓인 부품 장면과 거의 같은 모양이라, 실물 사진 없이 시뮬레이터로 학습 데이터를 만드는 방법을 공부할 때 참고가 될 것 같다.</li> <li>한계에 적힌 “검출이 병목”은 앞 단계가 얼마나 중요한지 보여 준다. SAM-6D가 분할 점수를 세 가지로 다듬는 데 공을 들인 것도 같은 이유일 것이다. 자세 추정이 아무리 좋아도 엉뚱한 마스크를 받으면 소용이 없다.</li> </ul> </div> </article> </div> </div> </div> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2026 JIYONG CHOI. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. </div> </footer> <script>
+  window.alFolio = {
+    compatBootstrap: false
+  };
+</script> <script src="/blog/assets/js/nav-toggle.js?v=141bd79a73ebc0f0b6ea58e440ae79fc"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/js/masonry.js?v=e49affc7bd2646f6acdad1dbe02c2359" type="text/javascript"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/blog/assets/al_math/js/mathjax-setup.js"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script src="/blog/assets/js/tooltips-setup.js?v=fe487e99db6c43751e6e7bdb2d6a0611"></script> <script defer src="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.js" integrity="sha256-lo/r+jQ81wWrxdIiiiEEd538z4+dTJTt+leOuAS7GCw=" crossorigin="anonymous"></script> <script src="/blog/assets/js/no_defer.js?v=53b1b1a645525975c963ce8bf8bfefcf"></script> <script defer src="/blog/assets/js/common.js?v=87baac90f765f2f3362dcf6aaf312a8a"></script> <script defer src="/blog/assets/js/copy_code.js?v=c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/blog/assets/js/jupyter_new_tab.js?v=896d254890d9b47f0281f63bfccf0dee"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/blog/assets/al_img_tools/js/zoom.js"></script> <script defer src="/blog/assets/js/progress-bar.js?v=499464c5c63ced6cf7ad62509f1e2610" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js" integrity="sha256-uMJJ3EoTyfRBoTbR+lrfu1uRQ87RZG8AR3cVNuQVeFg=" crossorigin="anonymous"></script> <script>
+    addBackToTop();
+  </script> <script type="module" src="/blog/assets/al_search/js/search/ninja-keys.min.js"></script> <ninja-keys hidebreadcrumbs noautoloadmdicons placeholder="Type to start searching"></ninja-keys> <script src="/blog/assets/al_search/js/search-setup.js"></script> <script>
+// get the ninja-keys element
+const ninja = document.querySelector('ninja-keys');
+
+// add the home and posts menu items
+ninja.data = [{
+    id: "nav-about",
+    title: "about",
+    section: "Navigation",
+    handler: () => {
+      window.location.href = "/blog/";
+    },
+  },{id: "nav-blog",
+          title: "blog",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/blog/blog/";
+          },
+        },{id: "post-논문-리뷰-foundationpose-unified-6d-pose-estimation-and-tracking-of-novel-objects",
+        
+          title: "[논문 리뷰] FoundationPose: Unified 6D Pose Estimation and Tracking of Novel Objects",
+        
+        description: "대규모 합성 데이터로 한 번 학습한 렌더링-비교 네트워크로, CAD나 참조 이미지만 있으면 처음 보는 물체의 6D 자세를 추정하고 추적하는 FoundationPose 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/foundationpose/";
+          
+        },
+      },{id: "post-논문-리뷰-sam-6d-segment-anything-model-meets-zero-shot-6d-object-pose-estimation",
+        
+          title: "[논문 리뷰] SAM-6D: Segment Anything Model Meets Zero-Shot 6D Object Pose Estimation",
+        
+        description: "SAM으로 후보 마스크를 모두 만들고 렌더링 템플릿과 비교해 물체를 고른 뒤, 배경 토큰을 둔 2단계 점 매칭으로 처음 보는 물체의 6D 자세를 구하는 SAM-6D 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/sam-6d/";
+          
+        },
+      },{id: "post-논문-리뷰-ffb6d-a-full-flow-bidirectional-fusion-network-for-6d-pose-estimation",
+        
+          title: "[논문 리뷰] FFB6D: A Full Flow Bidirectional Fusion Network for 6D Pose Estimation...",
+        
+        description: "RGB를 보는 CNN과 점군을 보는 네트워크를 모든 층에서 양방향으로 섞고, SIFT-FPS로 고른 3D 키포인트에 투표해 6D 자세를 구하는 FFB6D 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/ffb6d/";
+          
+        },
+      },{id: "post-논문-리뷰-posecnn-6d-object-pose-estimation-in-cluttered-scenes",
+        
+          title: "[논문 리뷰] PoseCNN: 6D Object Pose Estimation in Cluttered Scenes",
+        
+        description: "물체 중심 투표로 위치를, 쿼터니언 회귀로 회전을 따로 구하고, 대칭 물체용 ShapeMatch-Loss와 YCB-Video 데이터셋을 함께 낸 PoseCNN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/posecnn/";
+          
+        },
+      },{id: "post-논문-리뷰-model-globally-match-locally-point-pair-features",
+        
+          title: "[논문 리뷰] Model Globally, Match Locally (Point Pair Features)",
+        
+        description: "모델의 모든 점 쌍을 해시 테이블에 넣어 두고, 장면 점 쌍으로 2차원 표에 투표해 초기 자세 없이 3D 물체의 6자유도 자세를 찾는 PPF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/model-globally-match-locally-ppf/";
+          
+        },
+      },{id: "post-논문-리뷰-a-method-for-registration-of-3-d-shapes-icp",
+        
+          title: "[논문 리뷰] A Method for Registration of 3-D Shapes (ICP)",
+        
+        description: "가장 가까운 점 찾기와 최소제곱 정합을 번갈아 반복해 두 3D 형상을 맞추는 ICP 알고리즘, 그 수렴 증명과 초기 자세 문제를 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/icp-registration-of-3d-shapes/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseek-r1-incentivizing-reasoning-capability-in-llms-via-reinforcement-learning",
+        
+          title: "[논문 리뷰] DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+        
+        description: "지도학습 없이 규칙 기반 보상과 GRPO만으로 긴 추론 능력이 생겨나는 것을 보인 R1-Zero와, 이를 실용 모델로 다듬은 DeepSeek-R1 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseek-r1/";
+          
+        },
+      },{id: "post-논문-리뷰-deepseekmath-pushing-the-limits-of-mathematical-reasoning-grpo",
+        
+          title: "[논문 리뷰] DeepSeekMath: Pushing the Limits of Mathematical Reasoning (GRPO)",
+        
+        description: "가치 함수 없이 그룹 내 상대 보상으로 advantage를 계산하는 GRPO를 제안하고, 수학 추론 특화 7B 모델을 만든 DeepSeekMath 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/deepseekmath-grpo/";
+          
+        },
+      },{id: "post-논문-리뷰-proximal-policy-optimization-algorithms-ppo",
+        
+          title: "[논문 리뷰] Proximal Policy Optimization Algorithms (PPO)",
+        
+        description: "TRPO의 KL 제약을 확률비 클리핑으로 대신해 1차 최적화만으로 안정적인 정책 학습을 가능하게 한 PPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/proximal-policy-optimization-algorithms/";
+          
+        },
+      },{id: "post-논문-리뷰-trust-region-policy-optimization-trpo",
+        
+          title: "[논문 리뷰] Trust Region Policy Optimization (TRPO)",
+        
+        description: "정책 업데이트 폭을 KL 발산으로 묶어 성능이 단조롭게 개선되도록 보장한 TRPO 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/trust-region-policy-optimization/";
+          
+        },
+      },{id: "post-논문-리뷰-segment-anything-sam",
+        
+          title: "[논문 리뷰] Segment Anything (SAM)",
+        
+        description: "프롬프트 기반 분할이라는 새로운 태스크와 11M 이미지·1B 마스크 데이터 엔진으로 제로샷 분할 파운데이션 모델을 만든 SAM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/segment-anything/";
+          
+        },
+      },{id: "post-논문-리뷰-2d-gaussian-splatting-for-geometrically-accurate-radiance-fields",
+        
+          title: "[논문 리뷰] 2D Gaussian Splatting for Geometrically Accurate Radiance Fields",
+        
+        description: "3D 가우시안을 표면에 붙는 2D 원반으로 눌러서 3DGS의 기하 정확도 문제를 해결한 2DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-straight-and-fast-learning-to-generate-and-transfer-data-with-rectified-flow",
+        
+          title: "[논문 리뷰] Flow Straight and Fast: Learning to Generate and Transfer Data with...",
+        
+        description: "두 분포를 잇는 ODE의 궤적을 직선에 가깝게 반복 정제(reflow)해 적은 스텝으로 생성하는 Rectified Flow 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-straight-and-fast-rectified-flow/";
+          
+        },
+      },{id: "post-논문-리뷰-flow-matching-for-generative-modeling",
+        
+          title: "[논문 리뷰] Flow Matching for Generative Modeling",
+        
+        description: "시뮬레이션 없이 continuous normalizing flow를 회귀 손실 하나로 직접 학습시키는 Flow Matching 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/flow-matching-for-generative-modeling/";
+          
+        },
+      },{id: "post-논문-리뷰-3d-gaussian-splatting-for-real-time-radiance-field-rendering",
+        
+          title: "[논문 리뷰] 3D Gaussian Splatting for Real-Time Radiance Field Rendering",
+        
+        description: "3D 장면을 명시적인 3D 가우시안들로 표현하고 rasterization으로 실시간 렌더링하는 3DGS 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/3d-gaussian-splatting/";
+          
+        },
+      },{id: "post-논문-리뷰-nerf-representing-scenes-as-neural-radiance-fields-for-view-synthesis",
+        
+          title: "[논문 리뷰] NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis",
+        
+        description: "3D 장면을 MLP 하나로 표현하고 미분 가능한 볼륨 렌더링으로 새로운 시점의 이미지를 합성하는 NeRF 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/nerf-representing-scenes-as-neural-radiance-fields/";
+          
+        },
+      },{id: "post-논문-리뷰-high-resolution-image-synthesis-with-latent-diffusion-models-stable-diffusion",
+        
+          title: "[논문 리뷰] High-Resolution Image Synthesis with Latent Diffusion Models (Stable Diffusion)",
+        
+        description: "픽셀 공간 대신 압축된 잠재공간에서 diffusion을 수행해 고해상도 이미지 생성을 효율적으로 만든 Stable Diffusion 계열의 기반 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/high-resolution-image-synthesis-with-latent-diffusion-models/";
+          
+        },
+      },{id: "post-논문-리뷰-taming-transformers-for-high-resolution-image-synthesis-vq-gan",
+        
+          title: "[논문 리뷰] Taming Transformers for High-Resolution Image Synthesis (VQ-GAN)",
+        
+        description: "VQ-GAN으로 이미지를 이산 토큰으로 압축하고 Transformer prior로 고해상도 이미지를 생성하는 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/taming-transformers-for-high-resolution-image-synthesis/";
+          
+        },
+      },{id: "post-논문-리뷰-neural-discrete-representation-learning-vq-vae",
+        
+          title: "[논문 리뷰] Neural Discrete Representation Learning (VQ-VAE)",
+        
+        description: "연속적인 잠재변수를 벡터 양자화로 이산 코드로 바꾸어 의미 있는 표현과 강력한 생성모델을 만드는 VQ-VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/neural-discrete-representation-learning/";
+          
+        },
+      },{id: "post-논문-리뷰-denoising-diffusion-probabilistic-models-ddpm",
+        
+          title: "[논문 리뷰] Denoising Diffusion Probabilistic Models (DDPM)",
+        
+        description: "데이터에 점진적으로 노이즈를 주입하는 forward process와 그걸 거꾸로 복원하도록 학습하는 reverse process로 생성모델을 구성한 DDPM 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/denoising-diffusion-probabilistic-models/";
+          
+        },
+      },{id: "post-논문-리뷰-generative-adversarial-networks-gan",
+        
+          title: "[논문 리뷰] Generative Adversarial Networks (GAN)",
+        
+        description: "생성자와 판별자를 적대적으로 경쟁시켜 명시적 우도 계산 없이 데이터 분포를 학습하는 GAN 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/generative-adversarial-networks/";
+          
+        },
+      },{id: "post-논문-리뷰-auto-encoding-variational-bayes-vae",
+        
+          title: "[논문 리뷰] Auto-Encoding Variational Bayes (VAE)",
+        
+        description: "잠재변수 모델을 신경망으로 근사하고 reparameterization trick으로 학습 가능하게 만든 VAE 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/auto-encoding-variational-bayes/";
+          
+        },
+      },{id: "post-논문-리뷰-dinov2-learning-robust-visual-features-without-supervision",
+        
+          title: "[논문 리뷰] DINOv2: Learning Robust Visual Features without Supervision",
+        
+        description: "큐레이션한 1.4억 장 데이터와 자기지도 학습으로 파인튜닝 없이 쓸 수 있는 범용 시각 특징을 만든 DINOv2 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/dinov2-learning-robust-visual-features-without-supervision/";
+          
+        },
+      },{id: "post-논문-리뷰-an-image-is-worth-16x16-words-transformers-for-image-recognition-at-scale-vit",
+        
+          title: "[논문 리뷰] An Image is Worth 16x16 Words: Transformers for Image Recognition at...",
+        
+        description: "이미지를 16x16 패치 시퀀스로 잘라 순수 Transformer 인코더로 분류하는 ViT 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/an-image-is-worth-16x16-words/";
+          
+        },
+      },{id: "post-논문-리뷰-attention-is-all-you-need-transformer",
+        
+          title: "[논문 리뷰] Attention Is All You Need (Transformer)",
+        
+        description: "RNN과 CNN 없이 어텐션만으로 시퀀스 변환 모델을 구성한 Transformer 논문 정리",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/attention-is-all-you-need/";
+          
+        },
+      },{
+        id: 'social-email',
+        title: 'email',
+        section: 'Socials',
+        handler: () => {
+          window.open("mailto:%79%6F%6E%67%79%6F%6E%67@%68%61%6E%73%75%6E%67.%61%63.%6B%72", "_blank");
+        },
+      },{
+        id: 'social-github',
+        title: 'GitHub',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://github.com/YONGJI04", "_blank");
+        },
+      },{
+        id: 'social-rss',
+        title: 'RSS Feed',
+        section: 'Socials',
+        handler: () => {
+          window.open("/blog/feed.xml", "_blank");
+        },
+      },{
+      id: 'light-theme',
+      title: 'Change theme to light',
+      description: 'Change the theme of the site to Light',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("light");
+      },
+    },
+    {
+      id: 'dark-theme',
+      title: 'Change theme to dark',
+      description: 'Change the theme of the site to Dark',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("dark");
+      },
+    },
+    {
+      id: 'system-theme',
+      title: 'Use system default theme',
+      description: 'Change the theme of the site to System Default',
+      section: 'Theme',
+      handler: () => {
+        setThemeSetting("system");
+      },
+    },];
+
+</script> <script src="/blog/assets/al_search/js/shortcut-key.js"></script> </body> </html>
